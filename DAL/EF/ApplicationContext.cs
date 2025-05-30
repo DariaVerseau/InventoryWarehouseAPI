@@ -22,6 +22,9 @@ public class ApplicationContext : DbContext
         // Применение конфигураций
         modelBuilder.ApplyConfiguration(new ProductMap());
         modelBuilder.ApplyConfiguration(new InventoryTransactionMap());
-        
+        modelBuilder.ApplyConfiguration(new SupplierMap());
+        modelBuilder.ApplyConfiguration(new WarehouseMap());
+        modelBuilder.ApplyConfiguration(new CategoryMap());
+        modelBuilder.ApplyConfiguration(new InventoryMap());
     }
 }

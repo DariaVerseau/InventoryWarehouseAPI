@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DAL.Entities;
@@ -10,43 +11,51 @@ public class Category : BaseEntity
     
 }
 
-public class CategoryMap
+public class CategoryMap : IEntityTypeConfiguration<Category>
 {
-    public CategoryMap(EntityTypeBuilder<Category> builder)
+    public void Configure(EntityTypeBuilder<Category> builder)
     {
-        builder.HasKey(c => c.Id);
-        builder.Property(c => c.Name).HasMaxLength(50).IsRequired();
-        builder.Property(c => c.Description).IsRequired();
-        builder.Property(c => c.CreatedAt).IsRequired();
-        builder.Property(c => c.UpdatedAt).IsRequired();
+        builder.ToTable("categories"); // Явное указание имени таблицы
+
+        // Первичный ключ
+        builder.HasKey(c => c.Id)
+              .HasName("pk_categories"); // Имя первичного ключа в БД
+
+        // Настройка свойств
+        builder.Property(c => c.Name)
+              .IsRequired()
+              .HasMaxLength(50)
+              .HasColumnName("name")
+              .HasComment("Наименование категории товаров");
+
+        builder.Property(c => c.Description)
+              .IsRequired()
+              .HasColumnName("description")
+              .HasMaxLength(500) // Рекомендуется ограничение длины
+              .HasComment("Подробное описание категории");
+
+        // Автоматические временные метки
+        builder.Property(c => c.CreatedAt)
+              .IsRequired()
+              .HasColumnName("created_at")
+              .HasDefaultValueSql("CURRENT_TIMESTAMP")
+              .ValueGeneratedOnAdd()
+              .HasComment("Дата создания записи");
+
+        builder.Property(c => c.UpdatedAt)
+              .IsRequired()
+              .HasColumnName("updated_at")
+              .HasDefaultValueSql("CURRENT_TIMESTAMP")
+              .ValueGeneratedOnAddOrUpdate()
+              .HasComment("Дата последнего обновления");
+        
+
+        // Настройка связи с продуктами (если есть навигационное свойство)
+        builder.HasMany(c => c.Products)
+              .WithOne(p => p.Category)
+              .HasForeignKey(p => p.CategoryId)
+              .OnDelete(DeleteBehavior.Restrict)
+              .HasConstraintName("fk_products_category");
     }
 }
 
-/*
- *CREATE TABLE categories (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
-    description TEXT
-);
-
-
-public class Warehouse : BaseEntity
-{
-    public string Name { get; set; } = string.Empty;
-    public string Location { get; set; } = string.Empty;
-}
-
-public class WarehouseMap
-{
-    public WarehouseMap(EntityTypeBuilder<Warehouse> builder)
-    {
-       builder.HasKey(x => x.Id); 
-       builder.Property(x => x.Name).IsRequired();
-       builder.Property(x => x.Location).IsRequired();
-       builder.Property(b => b.CreatedAt).IsRequired();
-       builder.Property(b => b.UpdatedAt).IsRequired();
-       
-    }
-}
- * 
- */

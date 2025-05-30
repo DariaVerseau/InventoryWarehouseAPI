@@ -6,19 +6,52 @@ public class Warehouse : BaseEntity
     public string Name { get; set; } = string.Empty;
     public string Location { get; set; } = string.Empty;
     
+    public List<Inventory> InventoryItems { get; set; } = new();
+    public IEnumerable<InventoryTransaction>? InventoryTransactions { get; set; } 
+    
 }
 
-public class WarehouseMap
+public class WarehouseMap : IEntityTypeConfiguration<Warehouse>
 {
-    public WarehouseMap(EntityTypeBuilder<Warehouse> builder)
+    public void Configure(EntityTypeBuilder<Warehouse> builder)
     {
-       builder.HasKey(x => x.Id); 
-       builder.Property(x => x.Name).IsRequired();
-       builder.Property(x => x.Location).IsRequired();
-       builder.Property(b => b.CreatedAt).IsRequired();
-       builder.Property(b => b.UpdatedAt).IsRequired();
-       
+        builder.ToTable("warehouses");  // Явное указание имени таблицы в БД
+
+        builder.HasKey(w => w.Id);
+        
+        builder.Property(w => w.Name)
+            .IsRequired()
+            .HasMaxLength(100)  // Рекомендуется указывать максимальную длину
+            .HasColumnName("name")  // Соответствие имени столбца в БД
+            .HasComment("Наименование склада");  // Добавление комментария
+            
+        builder.Property(w => w.Location)
+            .IsRequired()
+            .HasMaxLength(200)
+            .HasColumnName("location")
+            .HasComment("Физическое расположение склада");
+            
+        builder.Property(w => w.CreatedAt)
+            .IsRequired()
+            .HasColumnName("created_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")  // Значение по умолчанию
+            .ValueGeneratedOnAdd()  // Автогенерация при создании
+            .HasComment("Дата создания записи");
+            
+        builder.Property(w => w.UpdatedAt)
+            .IsRequired()
+            .HasColumnName("updated_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")  // Значение по умолчанию
+            .ValueGeneratedOnAddOrUpdate()  // Автогенерация при обновлении
+            .HasComment("Дата последнего обновления");
+        
+            
+        // Настройка связи с Inventory (если есть навигационное свойство)
+        builder.HasMany(w => w.InventoryItems)
+            .WithOne(i => i.Warehouse)
+            .HasForeignKey(i => i.WarehouseId)
+            .OnDelete(DeleteBehavior.Restrict)  // Запрет удаления если есть остатки
+            .HasConstraintName("FK_inventory_warehouses");
     }
-    
 }
 
