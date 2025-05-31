@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DAL.EF;
 
-public class ApplicationContext : DbContext
+public class AppDbContext : DbContext
 {
     public DbSet<Category> Categories { get; set; }
     public DbSet<Inventory> Inventories { get; set; }
@@ -12,13 +12,14 @@ public class ApplicationContext : DbContext
     public DbSet<Supplier> Suppliers { get; set; }
     public DbSet<Warehouse> Warehouses { get; set; }
 
-    public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
         //Database.EnsureCreated();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         // Применение конфигураций
         modelBuilder.ApplyConfiguration(new ProductMap());
         modelBuilder.ApplyConfiguration(new InventoryTransactionMap());

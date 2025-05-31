@@ -1,6 +1,6 @@
 namespace DAL.Interfaces;
 
-public class IInventoryRepository
+public interface IInventoryRepository
 {
     
 }

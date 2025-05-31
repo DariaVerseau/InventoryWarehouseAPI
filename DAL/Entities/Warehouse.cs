@@ -6,8 +6,8 @@ public class Warehouse : BaseEntity
     public string Name { get; set; } = string.Empty;
     public string Location { get; set; } = string.Empty;
     
-    public List<Inventory> InventoryItems { get; set; } = new();
-    public IEnumerable<InventoryTransaction>? InventoryTransactions { get; set; } 
+    public List<Inventory> InventoryItems { get; set; } = new(); //навигационное свойство с Inventory
+    public IEnumerable<InventoryTransaction>? InventoryTransactions { get; set; } //навигационное свойство с InventoryTransaction
     
 }
 

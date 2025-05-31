@@ -31,15 +31,11 @@ public class InventoryTransactionMap : IEntityTypeConfiguration<InventoryTransac
         builder.ToTable("inventory_transactions"); // Явное указание имени таблицы
 
         builder.HasKey(t => t.Id);
-        
-        builder.Property(t => t.Id)
-            .HasColumnName("id")
-            .ValueGeneratedOnAdd();
             
         builder.Property(t => t.Quantity)
             .IsRequired()
             .HasColumnName("quantity")
-            .HasComment("Количество товара в транзакции");
+            .HasComment("Количество товара в транзакции"); 
             
         builder.Property(t => t.TransactionType)
             .IsRequired()
@@ -74,6 +70,19 @@ public class InventoryTransactionMap : IEntityTypeConfiguration<InventoryTransac
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("FK_inventory_transactions_warehouses");
         
+        builder.Property(i => i.CreatedAt)
+            .IsRequired()
+            .HasColumnName("created_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .ValueGeneratedOnAdd()
+            .HasComment("Дата создания записи");
+
+        builder.Property(i => i.UpdatedAt)
+            .IsRequired()
+            .HasColumnName("updated_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .ValueGeneratedOnAddOrUpdate()
+            .HasComment("Дата последнего обновления");
     }
 }
 

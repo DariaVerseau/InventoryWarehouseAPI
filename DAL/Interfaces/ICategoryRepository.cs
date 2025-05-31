@@ -1,6 +1,6 @@
 namespace DAL.Interfaces;
 
-public class ICategoryRepository
+public interface ICategoryRepository
 {
     
 }

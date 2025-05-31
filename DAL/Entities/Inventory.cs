@@ -18,9 +18,8 @@ public class InventoryMap : IEntityTypeConfiguration<Inventory>
     public void Configure(EntityTypeBuilder<Inventory> builder)
     {
         builder.ToTable("inventory"); // Явное указание имени таблицы
-
-        // Составной первичный ключ (ProductId + WarehouseId)
-        builder.HasKey(i => new { i.ProductId, i.WarehouseId });
+        
+        builder.HasKey(i => i.Id);
         
         builder.Property(i => i.Quantity)
             .IsRequired()
@@ -40,5 +39,19 @@ public class InventoryMap : IEntityTypeConfiguration<Inventory>
             .HasForeignKey(i => i.ProductId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("FK_inventory_products");
+        
+        builder.Property(i => i.CreatedAt)
+            .IsRequired()
+            .HasColumnName("created_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .ValueGeneratedOnAdd()
+            .HasComment("Дата создания записи");
+
+        builder.Property(i => i.UpdatedAt)
+            .IsRequired()
+            .HasColumnName("updated_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .ValueGeneratedOnAddOrUpdate()
+            .HasComment("Дата последнего обновления");
     }
 }

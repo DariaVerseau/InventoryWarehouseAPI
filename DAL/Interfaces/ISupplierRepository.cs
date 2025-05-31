@@ -1,6 +1,6 @@
 namespace DAL.Interfaces;
 
-public class ISupplierRepository
+public interface ISupplierRepository
 {
     
 }

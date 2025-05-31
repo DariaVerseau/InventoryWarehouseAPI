@@ -1,6 +1,6 @@
 namespace DAL.Interfaces;
 
-public class IProductRepository
+public interface IProductRepository
 {
     
 }

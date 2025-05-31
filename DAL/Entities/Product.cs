@@ -13,8 +13,8 @@ public class Product : BaseEntity
     public Supplier? Supplier { get; set; }
     
     // Навигационное свойство к остаткам
-    public List<Inventory> InventoryRecords { get; set; } = new();
-    public IEnumerable<InventoryTransaction>? InventoryTransactions { get; set; } 
+    public List<Inventory> InventoryRecords { get; set; } = new(); //навигационное свойство с Inventory
+    public IEnumerable<InventoryTransaction>? InventoryTransactions { get; set; } //навигационное свойство с InventoryTransaction
     
 }
 
