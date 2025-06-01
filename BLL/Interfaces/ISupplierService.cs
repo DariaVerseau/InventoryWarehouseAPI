@@ -1,5 +1,6 @@
 
 
+using BLL.DTOs;
 using DTO.Supplier;
 
 namespace BLL.Services;
@@ -11,5 +12,5 @@ public interface ISupplierService
     Task<SupplierDto> CreateAsync(SupplierDto supplierDto);
     Task<SupplierDto> UpdateAsync(SupplierDto supplierDto);
     Task<bool> DeleteAsync(Guid id);
-    //Task<List<SupplierWithProductsDto>> GetSuppliersWithProductsAsync();
+    Task<List<SupplierWithProductsDto>> GetSuppliersWithProductsAsync();
 }

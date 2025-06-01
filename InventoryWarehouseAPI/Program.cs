@@ -1,3 +1,4 @@
+using BLL.Services;
 using DAL.EF;
 using DAL.Interfaces;
 using DAL.Repositories;
@@ -16,6 +17,24 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 //
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+// Регистрация репозиториев
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
+builder.Services.AddScoped<IInventoryTransactionRepository, InventoryTransactionRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
+builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
+
+// Регистрация сервисов BLL
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddScoped<IInventoryTransactionService, InventoryTransactionService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<IWarehouseService, WarehouseService>();
+
+// Настройка AutoMapper
+builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 

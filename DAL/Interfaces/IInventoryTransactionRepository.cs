@@ -9,5 +9,6 @@ public interface IInventoryTransactionRepository : IRepository<InventoryTransact
     Task<List<InventoryTransactionDto>> GetByWarehouseId(Guid warehouseId);
     //Task<List<InventoryTransactionDto>> GetByType(TransactionType type);
     //Task<int> GetProductQuantityHistory(Guid productId);
-
+    //Task<List<InventoryTransactionDto>> GetByDateRange(DateTime start, DateTime end);
+    
 }

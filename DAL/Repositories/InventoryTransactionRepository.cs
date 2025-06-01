@@ -97,7 +97,7 @@ public class InventoryTransactionRepository(AppDbContext context) : IInventoryTr
 
         return transactions.Select(MapToDto).ToList();
     }
-
+    
     /*public async Task<List<InventoryTransactionDto>> GetByType(TransactionType type)
     {
         return await context.InventoryTransactions
