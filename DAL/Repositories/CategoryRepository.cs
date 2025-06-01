@@ -75,17 +75,12 @@ public class CategoryRepository(AppDbContext context) : ICategoryRepository
             Id = category.Id,
             Name = category.Name,
             Description = category.Description,
-            Products = category.Products?.Select(p => new ProductDto
+            Products = category.Products?.Select(p => new ProductShortDto()
             {
                 Id = p.Id,
-                Unit = p.Unit,
-                CategoryId = p.CategoryId,
-                SupplierId = p.SupplierId,
-                // Добавьте другие свойства продукта по необходимости
                 Name = p.Name,
-                CreatedAt = p.CreatedAt,
-                UpdatedAt = p.UpdatedAt
-            }).ToList() ?? new List<ProductDto>(),
+                Unit = p.Unit
+            }).ToList() ?? new List<ProductShortDto>(),
             CreatedAt = category.CreatedAt,
             UpdatedAt = category.UpdatedAt
         };

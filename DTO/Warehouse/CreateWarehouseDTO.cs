@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using DTO.Inventory;
 using DTO.InventoryTransaction;
 
 namespace DTO.Warehouse;

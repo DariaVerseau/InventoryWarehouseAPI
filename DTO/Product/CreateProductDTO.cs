@@ -12,11 +12,11 @@ public class CreateProductDto
     public string Unit { get; set; } = string.Empty;
     [Required]
     public Guid? CategoryId { get; set; }
-    public CategoryDto? Category { get; set; }
+    
     [Required]
     public Guid? SupplierId { get; set; }
-    public SupplierDto? Supplier { get; set; }
     
-    public List<Guid> InventoryIds { get; set; } = new();
-    public IEnumerable<Guid>? InventoryTransactionIds { get; set; } 
+    
+    //public List<Guid> InventoryIds { get; set; } = new();
+    //public IEnumerable<Guid>? InventoryTransactionIds { get; set; } 
 }

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using DTO.Category;
+using DTO.Inventory;
 using DTO.InventoryTransaction;
 using DTO.Supplier;
 

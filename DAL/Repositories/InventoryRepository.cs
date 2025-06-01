@@ -38,7 +38,7 @@ public class InventoryRepository(AppDbContext context) : IInventoryRepository
             WarehouseId = inventoryDto.WarehouseId,
             Quantity = inventoryDto.Quantity,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
 
         context.Inventories.Add(inventory);
@@ -47,7 +47,7 @@ public class InventoryRepository(AppDbContext context) : IInventoryRepository
         return MapToDto(inventory);
     }
 
-    public async Task<InventoryDto?> Update(UpdateInventoryDto inventoryDto)
+    public async Task<InventoryDto> Update(UpdateInventoryDto inventoryDto)
     {
         var inventory = await context.Inventories.FindAsync(inventoryDto.Id);
         if (inventory == null) return null;
@@ -56,6 +56,7 @@ public class InventoryRepository(AppDbContext context) : IInventoryRepository
         inventory.WarehouseId = inventoryDto.WarehouseId;
         inventory.Quantity = inventoryDto.Quantity;
         inventory.UpdatedAt = DateTime.UtcNow;
+        inventory.IsVisible = inventoryDto.IsVisible;
 
         await context.SaveChangesAsync();
 
@@ -105,18 +106,19 @@ public class InventoryRepository(AppDbContext context) : IInventoryRepository
         return new InventoryDto
         {
             Id = inventory.Id,
+            IsVisible = inventory.IsVisible,
             Quantity = inventory.Quantity,
-            Product = inventory.Product != null ? new ProductDto
+            Product = inventory.Product != null ? new ProductShortDto
             {
                 Id = inventory.Product.Id,
                 Name = inventory.Product.Name,
-                // Другие необходимые свойства продукта
+                Unit = inventory.Product.Unit
             } : null,
-            Warehouse = inventory.Warehouse != null ? new WarehouseDto
+            Warehouse = inventory.Warehouse != null ? new WarehouseShortDto
             {
                 Id = inventory.Warehouse.Id,
                 Name = inventory.Warehouse.Name,
-                // Другие необходимые свойства склада
+                Location = inventory.Warehouse.Location
             } : null,
             CreatedAt = inventory.CreatedAt,
             UpdatedAt = inventory.UpdatedAt
