@@ -13,13 +13,17 @@ public enum TransactionType
 public class InventoryTransaction : BaseEntity
 {
     
-    public int? ProductId { get; set; }
+    public Guid? ProductId { get; set; }
     public Product Product { get; set; }
-    public int? WarehouseId { get; set; }
+    public Guid? WarehouseId { get; set; }
     public Warehouse Warehouse { get; set; }
     public int Quantity { get; set; }
-    public TransactionType TransactionType { get; set; }
-  
+    /*public enum TransactionTypeEnum {
+        Incoming,
+        Outgoing,
+        Transfer
+    } */
+    //public TransactionTypeEnum TransactionType { get; set; }
     public DateTime TransactionDate { get; set; } = DateTime.UtcNow;
     
 }
@@ -37,7 +41,7 @@ public class InventoryTransactionMap : IEntityTypeConfiguration<InventoryTransac
             .HasColumnName("quantity")
             .HasComment("Количество товара в транзакции"); 
             
-        builder.Property(t => t.TransactionType)
+        /*builder.Property(t => t.TransactionType)
             .IsRequired()
             .HasMaxLength(10)
             .HasColumnName("transaction_type")
@@ -45,7 +49,7 @@ public class InventoryTransactionMap : IEntityTypeConfiguration<InventoryTransac
                 v => v.ToString().ToLower(),
                 v => (TransactionType)Enum.Parse(typeof(TransactionType), v, true))
             .HasAnnotation("CheckConstraint", "transaction_type IN ('incoming', 'outgoing', 'transfer')")
-            .HasComment("Тип транзакции: incoming, outgoing, transfer");
+            .HasComment("Тип транзакции: incoming, outgoing, transfer");*/
             
         builder.Property(t => t.TransactionDate)
             .IsRequired()

@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using DTO.Inventory;
+using DTO.InventoryTransaction;
 
 namespace DTO.Warehouse;
 
@@ -11,8 +13,8 @@ public class WarehouseDto
     [Required]
     public string Location { get; set; } = string.Empty;
     
-    public List<Guid> InventoryItemIds { get; set; } = new(); //навигационное свойство с Inventory
-    public IEnumerable<Guid>? InventoryTransactionIds { get; set; } 
+    public List<InventoryDto> InventoryItems { get; set; } = new(); //навигационное свойство с Inventory
+    public IEnumerable<InventoryTransactionDto>? InventoryTransactions { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }

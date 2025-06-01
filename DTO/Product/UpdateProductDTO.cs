@@ -12,9 +12,9 @@ public class UpdateProductDto
     [Required]
     public string Unit { get; set; } = string.Empty;
     public Guid? CategoryId { get; set; }
-    public CategoryDto? Category { get; set; }
+    //public CategoryDto? Category { get; set; }
     public Guid? SupplierId { get; set; }
-    public SupplierDto? Supplier { get; set; }
+    //public SupplierDto? Supplier { get; set; }
     
     public List<Guid> InventoryIds { get; set; } = new();
     public IEnumerable<Guid>? InventoryTransactionIds { get; set; } 

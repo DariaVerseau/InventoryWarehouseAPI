@@ -15,13 +15,13 @@ public class ProductDto
     public string Unit { get; set; } = string.Empty;
     [Required]
     public Guid? CategoryId { get; set; }
-   public CategoryDto? Category { get; set; }
+   public CategoryShortDto? Category { get; set; }
     [Required]
     public Guid? SupplierId { get; set; }
-    public SupplierDto? Supplier { get; set; }
+    public SupplierShortDto? Supplier { get; set; }
     
     // Навигационное свойство к остаткам
-    public List<InventoryDto> InventoryRecords { get; set; } = new();
+    public List<InventoryShortDto> InventoryRecords { get; set; } = new();
     public IEnumerable<InventoryTransactionDto>? InventoryTransactions { get; set; } 
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }

@@ -49,6 +49,13 @@ public class SupplierMap : IEntityTypeConfiguration<Supplier>
             .ValueGeneratedOnAddOrUpdate()
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
         
+     /*   builder.HasMany(s => s.Products)
+            .WithOne(p => p.Supplier)
+            .HasForeignKey(p => p.SupplierId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("FK_Products_Suppliers");*/
+        
             //навигация с product 
     }
 }

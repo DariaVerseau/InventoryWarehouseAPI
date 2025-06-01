@@ -12,10 +12,10 @@ public enum TransactionType
 public class InventoryTransactionDto
 {
     public Guid Id { get; set; }
-    public Guid? ProductId { get; set; }
+    //public Guid? ProductId { get; set; }
     public ProductShortDto? Product { get; set; }
-    public Guid? WarehouseId { get; set; }
-    public WarehouseDto? Warehouse { get; set; }
+    //public Guid? WarehouseId { get; set; }
+    public WarehouseShortDto? Warehouse { get; set; }
     public int Quantity { get; set; }
     public TransactionType TransactionType { get; set; }
   

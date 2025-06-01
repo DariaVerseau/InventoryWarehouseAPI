@@ -11,6 +11,7 @@ public class Product : BaseEntity
     public Category? Category { get; set; }
     public Guid? SupplierId { get; set; }
     public Supplier? Supplier { get; set; }
+    public int TotalQuantity { get; set; }
     
     // Навигационное свойство к остаткам
     public List<Inventory> InventoryRecords { get; set; } = new(); //навигационное свойство с Inventory
@@ -35,6 +36,11 @@ public class ProductMap : IEntityTypeConfiguration<Product>
             .IsRequired()
             .HasMaxLength(10)
             .HasColumnName("unit");
+        
+        builder.Property(p => p.TotalQuantity)
+            .IsRequired()
+            .HasColumnName("TotalQuantity")
+            .HasComment("Текущее количество товара");
             
         builder.Property(p => p.CreatedAt)
             .IsRequired()
