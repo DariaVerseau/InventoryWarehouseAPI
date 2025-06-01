@@ -1,14 +1,14 @@
 using System.ComponentModel.DataAnnotations;
 
+namespace DTO.Inventory;
+
 public class CreateInventoryDto
 {
     
     [Required]
-    [Range(1, int.MaxValue)]
     public Guid ProductId { get; set; }
 
     [Required]
-    [Range(1, int.MaxValue)]
     public Guid WarehouseId { get; set; }
 
     [Required]
@@ -16,4 +16,3 @@ public class CreateInventoryDto
     public int Quantity { get; set; }
     
 }
-

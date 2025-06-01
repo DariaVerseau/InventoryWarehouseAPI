@@ -7,9 +7,9 @@ public class Product : BaseEntity
 {
     public string Name { get; set; } = string.Empty;
     public string Unit { get; set; } = string.Empty;
-    public int? CategoryId { get; set; }
+    public Guid? CategoryId { get; set; }
     public Category? Category { get; set; }
-    public int? SupplierId { get; set; }
+    public Guid? SupplierId { get; set; }
     public Supplier? Supplier { get; set; }
     
     // Навигационное свойство к остаткам

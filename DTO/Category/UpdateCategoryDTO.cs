@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DTO.Category;
 
-public class UpdateCategoryDTO
+public class UpdateCategoryDto
 {
     public Guid Id { get; set; }
     [StringLength(100, MinimumLength = 2, ErrorMessage = "Название должно быть от 2 до 100 символов")]

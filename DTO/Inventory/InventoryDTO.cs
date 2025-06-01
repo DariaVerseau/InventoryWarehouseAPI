@@ -1,18 +1,17 @@
 using System.ComponentModel.DataAnnotations;
 using DTO.Product;
+using DTO.Warehouse;
 
 public class InventoryDto
 {
     public Guid Id { get; set; }
     
     [Required]
-    [Range(1, int.MaxValue)]
     public Guid ProductId { get; set; }
     
     public ProductDto? Product { get; set; }
     
     [Required]
-    [Range(1, int.MaxValue)]
     public Guid WarehouseId { get; set; }
     
     public WarehouseDto? Warehouse { get; set; }

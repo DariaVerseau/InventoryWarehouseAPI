@@ -1,19 +1,23 @@
 using System.ComponentModel.DataAnnotations;
 using DTO.Category;
+using DTO.InventoryTransaction;
+using DTO.Supplier;
 
 namespace DTO.Product;
 
-public class ProductDto
+public class ProductDto 
 {
     public Guid Id { get; set; }
     [Required]
     public string Name { get; set; } = string.Empty;
     [Required]
     public string Unit { get; set; } = string.Empty;
-    public int? CategoryId { get; set; }
-    public CategoryDto? Category { get; set; }
-    public int? SupplierId { get; set; }
-    public SupplierDto? Supplier { get; set; }
+    [Required]
+    public Guid? CategoryId { get; set; }
+   //public CategoryDto? Category { get; set; }
+    [Required]
+    public Guid? SupplierId { get; set; }
+    //public SupplierDto? Supplier { get; set; }
     
     // Навигационное свойство к остаткам
     public List<InventoryDto> InventoryRecords { get; set; } = new();
