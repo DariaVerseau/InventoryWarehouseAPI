@@ -18,7 +18,7 @@ public class CategoryRepository(AppDbContext context) : ICategoryRepository
         return categories.Select(MapToDto).ToList();
     }
 
-    public async Task<CategoryDto?> GetById(Guid id)
+    public async Task<CategoryDto> GetById(Guid id)
     {
         var category = await context.Categories
             .Include(c => c.Products)

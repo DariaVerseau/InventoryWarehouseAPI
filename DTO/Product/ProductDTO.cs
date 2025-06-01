@@ -14,10 +14,10 @@ public class ProductDto
     public string Unit { get; set; } = string.Empty;
     [Required]
     public Guid? CategoryId { get; set; }
-   //public CategoryDto? Category { get; set; }
+   public CategoryDto? Category { get; set; }
     [Required]
     public Guid? SupplierId { get; set; }
-    //public SupplierDto? Supplier { get; set; }
+    public SupplierDto? Supplier { get; set; }
     
     // Навигационное свойство к остаткам
     public List<InventoryDto> InventoryRecords { get; set; } = new();

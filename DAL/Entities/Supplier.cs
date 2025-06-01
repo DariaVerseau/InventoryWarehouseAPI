@@ -49,6 +49,7 @@ public class SupplierMap : IEntityTypeConfiguration<Supplier>
             .ValueGeneratedOnAddOrUpdate()
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
         
+            //навигация с product 
     }
 }
 
