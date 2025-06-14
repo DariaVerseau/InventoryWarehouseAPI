@@ -1,15 +1,13 @@
-using BLL.DTOs;
+
 using DTO.Warehouse;
 
-namespace BLL.Services;
+namespace BLL.Interfaces;
 
 public interface IWarehouseService
 {
-    Task<WarehouseDto> GetByIdAsync(Guid id);
-    Task<List<WarehouseDto>> GetAllAsync();
-    Task<WarehouseDto> CreateAsync(WarehouseDto warehouseDto);
-    Task<WarehouseDto> UpdateAsync(WarehouseDto warehouseDto);
-    Task<bool> DeleteAsync(Guid id);
-    Task<List<WarehouseWithStatsDto>> GetWarehousesWithStatsAsync();
-    //Task<bool> CheckCapacityAsync(Guid warehouseId, int requiredSpace);
+    Task<List<WarehouseDto>> GetWarehouses();
+    Task<WarehouseDto> GetWarehouse(Guid id);
+    Task<WarehouseDto> CreateWarehouse(CreateWarehouseDto warehouse);
+    Task<WarehouseDto> UpdateWarehouse(UpdateWarehouseDto warehouse);
+    Task DeleteWarehouse(Guid id);
 }

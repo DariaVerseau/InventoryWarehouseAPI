@@ -1,11 +1,13 @@
+
 using DTO.InventoryTransaction;
 
-namespace BLL.Services;
+namespace BLL.Interfaces;
 
 public interface IInventoryTransactionService
 {
-    Task<InventoryTransactionDto> ProcessTransactionAsync(InventoryTransactionDto transactionDto);
-    Task<List<InventoryTransactionDto>> GetByProductAsync(Guid productId);
-    Task<List<InventoryTransactionDto>> GetByWarehouseAsync(Guid warehouseId);
-    //Task<List<InventoryTransactionDto>> GetByDateRangeAsync(DateTime start, DateTime end);
+    Task<List<InventoryTransactionDto>> GetTransactions();
+    Task<InventoryTransactionDto> GetTransaction(Guid id);
+    Task<InventoryTransactionDto> CreateTransaction(CreateInventoryTransactionDto transaction);
+    Task<InventoryTransactionDto> UpdateTransaction(UpdateInventoryTransactionDto transaction);
+    Task DeleteTransaction(Guid id);
 }

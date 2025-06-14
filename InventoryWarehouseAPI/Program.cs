@@ -1,3 +1,4 @@
+using BLL.Interfaces;
 using BLL.Services;
 using DAL.EF;
 using DAL.Interfaces;
@@ -34,7 +35,7 @@ builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IWarehouseService, WarehouseService>();
 
 // Настройка AutoMapper
-builder.Services.AddAutoMapper(typeof(Program));
+//builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 

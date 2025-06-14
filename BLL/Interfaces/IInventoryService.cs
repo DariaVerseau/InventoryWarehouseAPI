@@ -1,12 +1,18 @@
+//using BLL.DTOs.Inventory;
 using DTO.Inventory;
 
-namespace BLL.Services;
+namespace BLL.Interfaces;
 
 public interface IInventoryService
 {
-    Task<InventoryDto> GetByIdAsync(Guid id);
-    Task<List<InventoryDto>> GetByProductIdAsync(Guid productId);
-    Task<List<InventoryDto>> GetByWarehouseIdAsync(Guid warehouseId);
-    Task<InventoryDto> UpdateStockAsync(Guid inventoryId, int quantityChange);
-    Task<int> GetTotalStockAsync(Guid productId);
+    Task<List<InventoryDto>> GetInventories();
+    Task<InventoryDto> GetInventory(Guid id);
+    Task<InventoryDto> CreateInventory(CreateInventoryDto inventory);
+    Task<InventoryDto> UpdateInventory(UpdateInventoryDto inventory);
+    Task DeleteInventory(Guid id);
+
+    Task<List<InventoryDto>> GetByProductId(Guid productId);
+    Task<int> GetTotalQuantity(Guid productId);
+
+    Task<List<InventoryDto>> GetByWarehouseId(Guid warehouseId);
 }

@@ -1,56 +1,34 @@
-using AutoMapper;
-
+using BLL.Interfaces;
 using DAL.Interfaces;
 using DTO.Inventory;
 
 namespace BLL.Services;
 
-public class InventoryService : IInventoryService
+public class InventoryService(IInventoryRepository inventoryRepository) : IInventoryService
 {
-    private readonly IInventoryRepository _inventoryRepo;
-    private readonly IMapper _mapper;
+    // Базовые CRUD-операции
+    public async Task<List<InventoryDto>> GetInventories() 
+        => await inventoryRepository.GetAll();
 
-    public InventoryService(IInventoryRepository inventoryRepo, IMapper mapper)
-    {
-        _inventoryRepo = inventoryRepo;
-        _mapper = mapper;
-    }
+    public async Task<InventoryDto> GetInventory(Guid id) 
+        => await inventoryRepository.GetById(id);
 
-    public async Task<InventoryDto> GetByIdAsync(Guid id)
-    {
-        var inventory = await _inventoryRepo.GetById(id);
-        return _mapper.Map<InventoryDto>(inventory);
-    }
+    public async Task<InventoryDto> CreateInventory(CreateInventoryDto inventoryDto) 
+        => await inventoryRepository.Create(inventoryDto);
 
-    public async Task<List<InventoryDto>> GetByProductIdAsync(Guid productId)
-    {
-        var inventories = await _inventoryRepo.GetByProductId(productId);
-        return _mapper.Map<List<InventoryDto>>(inventories);
-    }
+    public async Task<InventoryDto> UpdateInventory(UpdateInventoryDto inventoryDto) 
+        => await inventoryRepository.Update(inventoryDto);
 
-    public async Task<List<InventoryDto>> GetByWarehouseIdAsync(Guid warehouseId)
-    {
-        var inventories = await _inventoryRepo.GetByWarehouseId(warehouseId);
-        return _mapper.Map<List<InventoryDto>>(inventories);
-    }
+    public async Task DeleteInventory(Guid id) 
+        => await inventoryRepository.Delete(id);
 
-    public async Task<InventoryDto> UpdateStockAsync(Guid inventoryId, int quantityChange)
-    {
-        // Бизнес-логика проверки
-        if (quantityChange == 0)
-            throw new ArgumentException("Quantity change cannot be zero");
+    // Специфичные методы для инвентаря
+    public async Task<List<InventoryDto>> GetByProductId(Guid productId) 
+        => await inventoryRepository.GetByProductId(productId);
 
-        var inventory = await _inventoryRepo.GetById(inventoryId);
-        if (inventory == null)
-            throw new KeyNotFoundException("Inventory record not found");
+    public async Task<int> GetTotalQuantity(Guid productId) 
+        => await inventoryRepository.GetTotalQuantity(productId);
 
-        inventory.Quantity += quantityChange;
-        var updated = await _inventoryRepo.Update(inventory);
-        return _mapper.Map<InventoryDto>(updated);
-    }
-
-    public async Task<int> GetTotalStockAsync(Guid productId)
-    {
-        return await _inventoryRepo.GetTotalQuantity(productId);
-    }
+    public async Task<List<InventoryDto>> GetByWarehouseId(Guid warehouseId) 
+        => await inventoryRepository.GetByWarehouseId(warehouseId);
 }

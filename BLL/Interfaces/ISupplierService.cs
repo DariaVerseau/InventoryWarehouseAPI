@@ -1,16 +1,12 @@
-
-
-using BLL.DTOs;
 using DTO.Supplier;
 
-namespace BLL.Services;
+namespace BLL.Interfaces;
 
 public interface ISupplierService
 {
-    Task<SupplierDto> GetByIdAsync(Guid id);
-    Task<List<SupplierDto>> GetAllAsync();
-    Task<SupplierDto> CreateAsync(SupplierDto supplierDto);
-    Task<SupplierDto> UpdateAsync(SupplierDto supplierDto);
-    Task<bool> DeleteAsync(Guid id);
-    Task<List<SupplierWithProductsDto>> GetSuppliersWithProductsAsync();
+    Task<List<SupplierDto>> GetSuppliers();
+    Task<SupplierDto> GetSupplier(Guid id);
+    Task<SupplierDto> CreateSupplier(CreateSupplierDto supplier);
+    Task<SupplierDto> UpdateSupplier(UpdateSupplierDto supplier);
+    Task DeleteSupplier(Guid id);
 }
