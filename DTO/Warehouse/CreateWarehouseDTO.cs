@@ -12,6 +12,7 @@ public class CreateWarehouseDto
     [Required]
     public string Location { get; set; } = string.Empty;
     
-    public List<Guid> InventoryItemIds { get; set; } = new(); //навигационное свойство с Inventory
-    public IEnumerable<Guid>? InventoryTransactionIds { get; set; }
+    public List<CreateInventoryDto> InventoryItems { get; set; } = new(); // Инициализация по умолчанию
+    
+    public List<CreateInventoryTransactionDto> InventoryTransactions { get; set; } = new();
 }

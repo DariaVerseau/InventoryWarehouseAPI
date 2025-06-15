@@ -41,6 +41,8 @@ public class WarehouseRepository(AppDbContext context) : IWarehouseRepository
         {
             Name = warehouseDto.Name,
             Location = warehouseDto.Location,
+            InventoryItems = new List<Inventory>(), // Важно!
+            InventoryTransactions = new List<InventoryTransaction>(), // Важно!
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -98,39 +100,62 @@ public class WarehouseRepository(AppDbContext context) : IWarehouseRepository
             .SumAsync(i => i.Quantity);
     }
 
-    
     private static WarehouseDto MapToDto(Warehouse warehouse)
     {
+        // Полная защита от null
+        if (warehouse == null)
+        {
+            return new WarehouseDto
+            {
+                InventoryItems = new List<InventoryDto>(),
+                InventoryTransactions = Enumerable.Empty<InventoryTransactionDto>()
+            };
+        }
+
+        // Безопасное преобразование InventoryItems
+        var inventoryItems = warehouse.InventoryItems != null
+            ? warehouse.InventoryItems
+                .Where(i => i != null)
+                .Select(i => new InventoryDto
+                {
+                    Id = i.Id,
+                    Quantity = i.Quantity,
+                    Product = i.Product != null ? new ProductShortDto
+                    {
+                        Id = i.Product.Id,
+                        Name = i.Product.Name ?? string.Empty,
+                        Unit = i.Product.Unit ?? string.Empty
+                    } : null
+                }).ToList()
+            : new List<InventoryDto>();
+
+        // Безопасное преобразование InventoryTransactions
+        var inventoryTransactions = warehouse.InventoryTransactions != null
+            ? warehouse.InventoryTransactions
+                .Where(t => t != null)
+                .Select(t => new InventoryTransactionDto
+                {
+                    Id = t.Id,
+                    Quantity = t.Quantity,
+                    TransactionDate = t.TransactionDate,
+                    Product = t.Product != null ? new ProductShortDto
+                    {
+                        Id = t.Product.Id,
+                        Name = t.Product.Name ?? string.Empty
+                    } : null
+                })
+            : Enumerable.Empty<InventoryTransactionDto>();
+
         return new WarehouseDto
         {
             Id = warehouse.Id,
-            Name = warehouse.Name,
-            Location = warehouse.Location,
-            InventoryItems = warehouse.InventoryItems.Select(i => new InventoryDto
-            {
-                Id = i.Id,
-                Quantity = i.Quantity,
-                Product = i.Product != null ? new ProductShortDto
-                {
-                    Id = i.Product.Id,
-                    Name = i.Product.Name,
-                    Unit = i.Product.Unit
-                } : null
-            }).ToList(),
-            InventoryTransactions = warehouse.InventoryTransactions.Select(t => new InventoryTransactionDto
-            {
-                Id = t.Id,
-                //TransactionType = t.TransactionType,
-                Quantity = t.Quantity,
-                TransactionDate = t.TransactionDate,
-                Product = t.Product != null ? new ProductShortDto
-                {
-                    Id = t.Product.Id,
-                    Name = t.Product.Name
-                } : null
-            }).ToList(),
+            Name = warehouse.Name ?? string.Empty,
+            Location = warehouse.Location ?? string.Empty,
+            InventoryItems = inventoryItems,
+            InventoryTransactions = inventoryTransactions,
             CreatedAt = warehouse.CreatedAt,
             UpdatedAt = warehouse.UpdatedAt
         };
     }
+    
 }

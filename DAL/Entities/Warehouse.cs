@@ -1,14 +1,20 @@
 namespace DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 public class Warehouse : BaseEntity
 {
     public string Name { get; set; } = string.Empty;
     public string Location { get; set; } = string.Empty;
     
-    public List<Inventory> InventoryItems { get; set; } = new(); //навигационное свойство с Inventory
-    public IEnumerable<InventoryTransaction>? InventoryTransactions { get; set; } //навигационное свойство с InventoryTransaction
-    
+    public virtual ICollection<Inventory> InventoryItems { get; set; }
+    public virtual ICollection<InventoryTransaction> InventoryTransactions { get; set; }
+
+    public Warehouse()
+    {
+        InventoryItems = new List<Inventory>();
+        InventoryTransactions = new List<InventoryTransaction>();
+    }
 }
 
 public class WarehouseMap : IEntityTypeConfiguration<Warehouse>
