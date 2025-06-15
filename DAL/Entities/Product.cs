@@ -13,6 +13,8 @@ public class Product : BaseEntity
     public Supplier? Supplier { get; set; }
     public int TotalQuantity { get; set; }
     
+    public bool IsVisible { get; set; }
+    
     // Навигационное свойство к остаткам
     public List<Inventory> InventoryRecords { get; set; } = new(); //навигационное свойство с Inventory
     public IEnumerable<InventoryTransaction>? InventoryTransactions { get; set; } //навигационное свойство с InventoryTransaction
@@ -51,6 +53,11 @@ public class ProductMap : IEntityTypeConfiguration<Product>
             .IsRequired()
             .HasColumnName("updated_at")
             .ValueGeneratedOnAddOrUpdate();
+        
+        builder
+            .Property(an => an.IsVisible)
+            .HasDefaultValue(true)
+            .IsRequired();
         
         // Настройка связи с Category
         builder.HasOne(p => p.Category)

@@ -51,6 +51,7 @@ public class CategoryRepository(AppDbContext context) : ICategoryRepository
         category.Name = categoryDto.Name;
         category.Description = categoryDto.Description;
         category.UpdatedAt = DateTime.UtcNow;
+        category.IsVisible = categoryDto.IsVisible;
 
         await context.SaveChangesAsync();
 
@@ -82,7 +83,8 @@ public class CategoryRepository(AppDbContext context) : ICategoryRepository
                 Unit = p.Unit
             }).ToList() ?? new List<ProductShortDto>(),
             CreatedAt = category.CreatedAt,
-            UpdatedAt = category.UpdatedAt
+            UpdatedAt = category.UpdatedAt,
+            IsVisible = category.IsVisible
         };
     }
 }

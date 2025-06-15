@@ -7,6 +7,8 @@ public class Category : BaseEntity
 {
     public string Name { get; set; } = String.Empty;
     public string Description { get; set; } = String.Empty;
+    
+    public bool IsVisible { get; set; }
     public List<Product> Products { get; set; } = new List<Product>();
     
 }
@@ -48,6 +50,11 @@ public class CategoryMap : IEntityTypeConfiguration<Category>
               .HasDefaultValueSql("CURRENT_TIMESTAMP")
               .ValueGeneratedOnAddOrUpdate()
               .HasComment("Дата последнего обновления");
+        
+        builder
+              .Property(an => an.IsVisible)
+              .HasDefaultValue(true)
+              .IsRequired();
         
 
         // Настройка связи с продуктами (если есть навигационное свойство)

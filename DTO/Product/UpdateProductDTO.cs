@@ -16,6 +16,8 @@ public class UpdateProductDto
     public Guid? SupplierId { get; set; }
     //public SupplierDto? Supplier { get; set; }
     
+    public bool IsVisible { get; set; }
+    
     public List<Guid> InventoryIds { get; set; } = new();
     public IEnumerable<Guid>? InventoryTransactionIds { get; set; } 
 }

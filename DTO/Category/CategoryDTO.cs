@@ -15,4 +15,6 @@ public class CategoryDto
     public List<ProductShortDto> Products { get; set; } = new(); // вместо List<ProductDto>
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+    
+    public bool IsVisible { get; set; }
 }

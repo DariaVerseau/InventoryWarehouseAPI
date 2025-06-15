@@ -56,7 +56,6 @@ public class InventoryRepository(AppDbContext context) : IInventoryRepository
         inventory.WarehouseId = inventoryDto.WarehouseId;
         inventory.Quantity = inventoryDto.Quantity;
         inventory.UpdatedAt = DateTime.UtcNow;
-        inventory.IsVisible = inventoryDto.IsVisible;
 
         await context.SaveChangesAsync();
 
@@ -106,7 +105,6 @@ public class InventoryRepository(AppDbContext context) : IInventoryRepository
         return new InventoryDto
         {
             Id = inventory.Id,
-            IsVisible = inventory.IsVisible,
             Quantity = inventory.Quantity,
             Product = inventory.Product != null ? new ProductShortDto
             {

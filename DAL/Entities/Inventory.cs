@@ -5,7 +5,6 @@ namespace DAL.Entities;
 
 public class Inventory  : BaseEntity
 {
-    public bool IsVisible { get; set; }
     public Guid? ProductId { get; set; }
     public Product Product { get; set; }
     public Guid? WarehouseId { get; set; }
@@ -21,11 +20,6 @@ public class InventoryMap : IEntityTypeConfiguration<Inventory>
         builder.ToTable("inventory"); // Явное указание имени таблицы
         
         builder.HasKey(i => i.Id);
-        
-        builder
-            .Property(b => b.IsVisible)
-            .HasDefaultValue(true)
-            .IsRequired();
         
         builder.Property(i => i.Quantity)
             .IsRequired()

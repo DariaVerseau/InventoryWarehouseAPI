@@ -20,6 +20,8 @@ public class ProductDto
     public Guid? SupplierId { get; set; }
     public SupplierShortDto? Supplier { get; set; }
     
+    public bool IsVisible { get; set; }
+    
     // Навигационное свойство к остаткам
     public List<InventoryShortDto> InventoryRecords { get; set; } = new();
     public IEnumerable<InventoryTransactionDto>? InventoryTransactions { get; set; } 

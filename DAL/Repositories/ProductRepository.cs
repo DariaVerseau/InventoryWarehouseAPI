@@ -65,6 +65,7 @@ public class ProductRepository(AppDbContext context) : IProductRepository
         product.CategoryId = productDto.CategoryId;
         product.SupplierId = productDto.SupplierId;
         product.UpdatedAt = DateTime.UtcNow;
+        product.IsVisible = productDto.IsVisible;
 
         await context.SaveChangesAsync();
         return await GetById(product.Id);
@@ -152,7 +153,8 @@ public class ProductRepository(AppDbContext context) : IProductRepository
             }).OrderByDescending(t => t.TransactionDate).ToList() 
                 ?? new List<InventoryTransactionShortDto>(),*/
             CreatedAt = product.CreatedAt,
-            UpdatedAt = product.UpdatedAt
+            UpdatedAt = product.UpdatedAt,
+            IsVisible = product.IsVisible
         };
     }
 }

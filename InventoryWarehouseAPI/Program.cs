@@ -1,12 +1,33 @@
+using System.Text;
 using BLL.Interfaces;
 using BLL.Services;
 using DAL.EF;
 using DAL.Interfaces;
 using DAL.Repositories;
-
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Конфигурация JWT
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 // Add services to the container.
 // Для PostgreSQL
@@ -33,9 +54,6 @@ builder.Services.AddScoped<IInventoryTransactionService, InventoryTransactionSer
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IWarehouseService, WarehouseService>();
-
-// Настройка AutoMapper
-//builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 
