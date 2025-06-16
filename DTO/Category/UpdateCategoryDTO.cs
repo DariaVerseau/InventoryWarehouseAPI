@@ -10,7 +10,7 @@ public class UpdateCategoryDto
     
     [StringLength(500, ErrorMessage = "Описание не должно превышать 500 символов")]
     public string Description { get; set; } = String.Empty;
-    public List<Guid> ProductIds { get; set; } = new();
+    //public List<Guid> ProductIds { get; set; } = new();
     public bool IsVisible { get; set; }
     
 }

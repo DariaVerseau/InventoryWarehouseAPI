@@ -17,7 +17,7 @@ public class Product : BaseEntity
     
     // Навигационное свойство к остаткам
     public List<Inventory> InventoryRecords { get; set; } = new(); //навигационное свойство с Inventory
-    public IEnumerable<InventoryTransaction>? InventoryTransactions { get; set; } //навигационное свойство с InventoryTransaction
+    public List<InventoryTransaction> InventoryTransactions { get; set; } = new(); //навигационное свойство с InventoryTransaction
     
 }
 
@@ -47,12 +47,16 @@ public class ProductMap : IEntityTypeConfiguration<Product>
         builder.Property(p => p.CreatedAt)
             .IsRequired()
             .HasColumnName("created_at")
-            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")  // Значение по умолчанию
+            .ValueGeneratedOnAdd()  // Автогенерация при создании
+            .HasComment("Дата создания записи");
             
         builder.Property(p => p.UpdatedAt)
             .IsRequired()
             .HasColumnName("updated_at")
-            .ValueGeneratedOnAddOrUpdate();
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")  // Значение по умолчанию
+            .ValueGeneratedOnAddOrUpdate()  // Автогенерация при обновлении
+            .HasComment("Дата последнего обновления");
         
         builder
             .Property(an => an.IsVisible)

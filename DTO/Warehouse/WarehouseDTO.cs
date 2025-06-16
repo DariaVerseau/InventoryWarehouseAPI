@@ -13,8 +13,8 @@ public class WarehouseDto
     [Required]
     public string Location { get; set; } = string.Empty;
     
-    public List<InventoryDto> InventoryItems { get; set; } = new(); //навигационное свойство с Inventory
-    public IEnumerable<InventoryTransactionDto>? InventoryTransactions { get; set; }
+    public List<InventoryShortDto> InventoryItems { get; set; } = new(); //навигационное свойство с Inventory
+    public IEnumerable<InventoryTransactionShortDto>? InventoryTransactions { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }

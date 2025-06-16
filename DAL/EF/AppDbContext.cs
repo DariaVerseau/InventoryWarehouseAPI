@@ -39,5 +39,23 @@ public class AppDbContext : DbContext
                 Description = "Мужская и женская одежда" 
             }
         );
+        modelBuilder.Entity<Product>(entity =>
+        {
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnName("updated_at")
+                .IsRequired()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .ValueGeneratedOnAddOrUpdate();
+        });
+        
+        modelBuilder.HasPostgresEnum<TransactionType>();
+    
+        modelBuilder.Entity<InventoryTransaction>(entity =>
+        {
+            entity.Property(e => e.TransactionType)
+                .HasColumnName("transaction_type")
+                .HasColumnType("transaction_type_enum")
+                .HasConversion<string>();
+        });
     }
 }

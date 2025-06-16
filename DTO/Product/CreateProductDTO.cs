@@ -11,6 +11,8 @@ public class CreateProductDto
     [Required]
     public string Unit { get; set; } = string.Empty;
     [Required]
+    public int TotalQuantity { get; set; }
+    [Required]
     public Guid? CategoryId { get; set; }
     
     [Required]

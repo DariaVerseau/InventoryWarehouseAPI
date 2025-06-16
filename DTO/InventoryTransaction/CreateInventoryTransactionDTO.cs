@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using DTO.Product;
 using DTO.Warehouse;
 
@@ -5,13 +7,17 @@ namespace DTO.InventoryTransaction;
 
 public class CreateInventoryTransactionDto
 {
-    public Guid? ProductId { get; set; }
-    //public ProductShortDto? Product { get; set; }
-    public Guid? WarehouseId { get; set; }
-    //public WarehouseShortDto? Warehouse { get; set; }
+    [Required(ErrorMessage = "ProductId is required")]
+    public Guid ProductId { get; set; } // Убрали nullable
+
+    [Required]
+    public Guid WarehouseId { get; set; }
+ 
     public int Quantity { get; set; }
     
-    public TransactionType TransactionType { get; set; }
+    [Required]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public TransactionType TransactionType { get; set; } = TransactionType.Incoming;
     
   
     public DateTime TransactionDate { get; set; } = DateTime.UtcNow;

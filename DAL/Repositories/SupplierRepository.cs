@@ -104,7 +104,7 @@ public class SupplierRepository(AppDbContext context) : ISupplierRepository
                 {
                     Id = p.Category.Id,
                     Name = p.Category.Name,
-                    Description = p.Category.Description
+                    
                 } : null
             }).ToList() ?? new List<ProductShortDto>(),
             CreatedAt = supplier.CreatedAt,

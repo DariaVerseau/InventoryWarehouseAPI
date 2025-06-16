@@ -107,8 +107,8 @@ public class WarehouseRepository(AppDbContext context) : IWarehouseRepository
         {
             return new WarehouseDto
             {
-                InventoryItems = new List<InventoryDto>(),
-                InventoryTransactions = Enumerable.Empty<InventoryTransactionDto>()
+                InventoryItems = new List<InventoryShortDto>(),
+                InventoryTransactions = Enumerable.Empty<InventoryTransactionShortDto>()
             };
         }
 
@@ -116,35 +116,25 @@ public class WarehouseRepository(AppDbContext context) : IWarehouseRepository
         var inventoryItems = warehouse.InventoryItems != null
             ? warehouse.InventoryItems
                 .Where(i => i != null)
-                .Select(i => new InventoryDto
+                .Select(i => new InventoryShortDto
                 {
-                    Id = i.Id,
+                    WarehouseId = i.WarehouseId,
                     Quantity = i.Quantity,
-                    Product = i.Product != null ? new ProductShortDto
-                    {
-                        Id = i.Product.Id,
-                        Name = i.Product.Name ?? string.Empty,
-                        Unit = i.Product.Unit ?? string.Empty
-                    } : null
+                    WarehouseName = i.Warehouse.Name
                 }).ToList()
-            : new List<InventoryDto>();
+            : new List<InventoryShortDto>();
 
         // Безопасное преобразование InventoryTransactions
         var inventoryTransactions = warehouse.InventoryTransactions != null
             ? warehouse.InventoryTransactions
                 .Where(t => t != null)
-                .Select(t => new InventoryTransactionDto
+                .Select(t => new InventoryTransactionShortDto
                 {
                     Id = t.Id,
                     Quantity = t.Quantity,
                     TransactionDate = t.TransactionDate,
-                    Product = t.Product != null ? new ProductShortDto
-                    {
-                        Id = t.Product.Id,
-                        Name = t.Product.Name ?? string.Empty
-                    } : null
                 })
-            : Enumerable.Empty<InventoryTransactionDto>();
+            : Enumerable.Empty<InventoryTransactionShortDto>();
 
         return new WarehouseDto
         {
