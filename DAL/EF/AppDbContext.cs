@@ -48,8 +48,12 @@ public class AppDbContext : DbContext
                 .ValueGeneratedOnAddOrUpdate();
         });
         
-        // Регистрация enum типа
-        modelBuilder.HasPostgresEnum<TransactionType>("transaction_type_enum");
+        modelBuilder.HasPostgresEnum<TransactionType>();
+    
+        // Настраиваем маппинг для InventoryTransaction
+        modelBuilder.Entity<InventoryTransaction>()
+            .Property(e => e.TransactionType)
+            .HasConversion<string>();  // Конвертируем enum в строку
         
     }
 }

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shared.Enums;
@@ -13,6 +14,7 @@ public class InventoryTransaction : BaseEntity
     public Warehouse Warehouse { get; set; }
     public int Quantity { get; set; }
    
+    [Column(TypeName = "transaction_type_enum")]
     public TransactionType TransactionType { get; set; }
     public DateTime TransactionDate { get; set; } = DateTime.UtcNow;
     
@@ -31,10 +33,11 @@ public class InventoryTransactionMap : IEntityTypeConfiguration<InventoryTransac
             .HasColumnName("quantity")
             .HasComment("Количество товара в транзакции"); 
             
-        builder.Property(t => t.TransactionType)
-            .HasColumnName("transaction_type")
-            .HasColumnType("transaction_type_enum") // Указываем тип PostgreSQL
-            .HasConversion<string>(); // Конвертация между enum и string;
+        builder.Property(e => e.TransactionType)
+            .HasColumnType("transaction_type_enum")
+            .HasConversion(
+                v => v.ToString().ToLower(), // сохраняет как 'incoming' или 'outgoing'
+                v => (TransactionType)Enum.Parse(typeof(TransactionType), v, true));
             
         builder.Property(t => t.TransactionDate)
             .IsRequired()

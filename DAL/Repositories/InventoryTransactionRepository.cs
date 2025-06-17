@@ -7,7 +7,7 @@ using DTO.Product;
 using DTO.Warehouse;
 using Microsoft.EntityFrameworkCore;
 using Shared.Enums;
-//using TransactionType = Shared.Enums.TransactionType;
+
 
 
 namespace DAL.Repositories;
@@ -42,14 +42,23 @@ public class InventoryTransactionRepository(AppDbContext context) : IInventoryTr
             ProductId = transactionDto.ProductId,
             WarehouseId = transactionDto.WarehouseId,
             Quantity = transactionDto.Quantity,
-            TransactionType = transactionDto.TransactionType, //
+            TransactionType = transactionDto.TransactionType, // Уже правильный enum тип
             TransactionDate = DateTime.UtcNow,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
 
-        context.InventoryTransactions.Add(transaction);
+        await context.InventoryTransactions.AddAsync(transaction);
         await context.SaveChangesAsync();
+
+        // Загружаем связанные данные для возврата полного DTO
+        await context.Entry(transaction)
+            .Reference(t => t.Product)
+            .LoadAsync();
+            
+        await context.Entry(transaction)
+            .Reference(t => t.Warehouse)
+            .LoadAsync();
 
         return MapToDto(transaction);
     }

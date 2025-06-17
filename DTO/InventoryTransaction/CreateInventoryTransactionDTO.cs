@@ -16,7 +16,7 @@ public class CreateInventoryTransactionDto
  
     public int Quantity { get; set; }
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public TransactionType TransactionType { get; set; } = TransactionType.Incoming;
+    public TransactionType TransactionType { get; set; } = TransactionType.incoming;
     
   
     public DateTime TransactionDate { get; set; } = DateTime.UtcNow;

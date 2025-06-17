@@ -1,6 +1,7 @@
 using BLL.Interfaces;
 using DTO.InventoryTransaction;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Enums;
 
 namespace API.Controllers;
 
@@ -30,11 +31,19 @@ public class InventoryTransactionsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<InventoryTransactionDto>> Create([FromBody] CreateInventoryTransactionDto createTransactionDto)
+    public async Task<ActionResult<InventoryTransactionDto>> Create(
+        [FromBody] CreateInventoryTransactionDto createTransactionDto)
     {
-        var createdTransaction = await _transactionService.CreateTransaction(createTransactionDto);
-        return CreatedAtAction(nameof(GetById), new { id = createdTransaction.Id }, createdTransaction);
+        // Проверка допустимых значений enum
+        if (!Enum.IsDefined(typeof(TransactionType), createTransactionDto.TransactionType))
+        {
+            return BadRequest("Invalid transaction type");
+        }
+    
+        var result = await _transactionService.CreateTransaction(createTransactionDto);
+        return Ok(result);
     }
+   
 
     [HttpPut]
     public async Task<ActionResult<InventoryTransactionDto>> Update([FromBody] UpdateInventoryTransactionDto updateTransactionDto)

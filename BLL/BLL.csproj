@@ -30,6 +30,7 @@
       <ItemGroup>
       <ProjectReference Include="..\DTO\DTO.csproj" />
       <ProjectReference Include="..\DAL\DAL.csproj" />
+      <ProjectReference Include="..\Shared\Shared.csproj" />
     </ItemGroup>
 
 </Project>
