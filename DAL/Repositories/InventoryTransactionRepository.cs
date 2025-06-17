@@ -6,7 +6,9 @@ using DTO.InventoryTransaction;
 using DTO.Product;
 using DTO.Warehouse;
 using Microsoft.EntityFrameworkCore;
-using TransactionType = DAL.Entities.TransactionType;
+using Shared.Enums;
+//using TransactionType = Shared.Enums.TransactionType;
+
 
 namespace DAL.Repositories;
 
@@ -40,7 +42,7 @@ public class InventoryTransactionRepository(AppDbContext context) : IInventoryTr
             ProductId = transactionDto.ProductId,
             WarehouseId = transactionDto.WarehouseId,
             Quantity = transactionDto.Quantity,
-            //TransactionType = transactionDto.TransactionType,
+            TransactionType = transactionDto.TransactionType, //
             TransactionDate = DateTime.UtcNow,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
@@ -58,7 +60,7 @@ public class InventoryTransactionRepository(AppDbContext context) : IInventoryTr
         if (transaction == null) return null;
 
         transaction.Quantity = transactionDto.Quantity;
-        //transaction.TransactionType = transactionDto.TransactionType;
+        transaction.TransactionType = transactionDto.TransactionType; //
         transaction.UpdatedAt = DateTime.UtcNow;
 
         await context.SaveChangesAsync();
@@ -136,7 +138,7 @@ public class InventoryTransactionRepository(AppDbContext context) : IInventoryTr
                 Location = transaction.Warehouse.Location,
             } : null,
             Quantity = transaction.Quantity,
-            //TransactionType = transaction.TransactionType,
+            TransactionType = transaction.TransactionType,
             TransactionDate = transaction.TransactionDate,
             CreatedAt = transaction.CreatedAt,
             UpdatedAt = transaction.UpdatedAt

@@ -1,16 +1,11 @@
-using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using DTO.Product;
 using DTO.Warehouse;
+using Shared.Enums;
 
 namespace DTO.InventoryTransaction;
 
-public enum TransactionType
-{
-    Incoming,
-    Outgoing,
-    Transfer
-}
+
 public class InventoryTransactionDto
 {
     public Guid Id { get; set; }
@@ -18,8 +13,6 @@ public class InventoryTransactionDto
     
     public WarehouseShortDto? Warehouse { get; set; }
     public int Quantity { get; set; }
-    
-    [Required]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public TransactionType TransactionType { get; set; }
   

@@ -1,4 +1,5 @@
 using DAL.Entities;
+using Shared.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace DAL.EF;
@@ -16,7 +17,6 @@ public class AppDbContext : DbContext
     public DbSet<Supplier> Suppliers { get; set; }
     public DbSet<Warehouse> Warehouses { get; set; }
     public DbSet<User> Users { get; set; }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
@@ -48,14 +48,8 @@ public class AppDbContext : DbContext
                 .ValueGeneratedOnAddOrUpdate();
         });
         
-        modelBuilder.HasPostgresEnum<TransactionType>();
-    
-        modelBuilder.Entity<InventoryTransaction>(entity =>
-        {
-            entity.Property(e => e.TransactionType)
-                .HasColumnName("transaction_type")
-                .HasColumnType("transaction_type_enum")
-                .HasConversion<string>();
-        });
+        // Регистрация enum типа
+        modelBuilder.HasPostgresEnum<TransactionType>("transaction_type_enum");
+        
     }
 }

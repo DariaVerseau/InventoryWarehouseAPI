@@ -1,14 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shared.Enums;
 
 namespace DAL.Entities;
-
-public enum TransactionType
-{
-    Incoming,
-    Outgoing,
-    Transfer
-}
 
 public class InventoryTransaction : BaseEntity
 {
