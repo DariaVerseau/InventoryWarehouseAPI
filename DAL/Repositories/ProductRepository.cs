@@ -15,9 +15,7 @@ public class ProductRepository(AppDbContext context) : IProductRepository
         .AsNoTracking()
         .Include(p => p.Category)
         .Include(p => p.Supplier)
-        .Include(p => p.InventoryRecords)
-            .ThenInclude(i => i.Warehouse)
-        .Include(p => p.InventoryTransactions);
+        .Include(p => p.InventoryRecords);
 
     public async Task<List<ProductDto>> GetAll()
     {
@@ -105,19 +103,6 @@ public class ProductRepository(AppDbContext context) : IProductRepository
             .AsNoTracking()
             .Where(i => i.ProductId == productId)
             .SumAsync(i => i.Quantity);
-    }
-
-    public async Task<List<ProductWithStockDto>> GetProductsWithStockInfo()
-    {
-        return await BaseQuery
-            .Select(p => new ProductWithStockDto
-            {
-                Product = MapToDto(p),
-                TotalQuantity = p.InventoryRecords.Sum(i => i.Quantity),
-                LastTransactionDate = p.InventoryTransactions
-                    .Max(t => (DateTime?)t.TransactionDate)
-            })
-            .ToListAsync();
     }
 
     private static ProductDto MapToDto(Product product)

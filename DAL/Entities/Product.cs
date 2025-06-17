@@ -17,7 +17,6 @@ public class Product : BaseEntity
     
     // Навигационное свойство к остаткам
     public List<Inventory> InventoryRecords { get; set; } = new(); //навигационное свойство с Inventory
-    public List<InventoryTransaction> InventoryTransactions { get; set; } = new(); //навигационное свойство с InventoryTransaction
     
 }
 

@@ -2,8 +2,6 @@ using DAL.EF;
 using DAL.Entities;
 using DAL.Interfaces;
 using DTO.Inventory;
-using DTO.InventoryTransaction;
-using DTO.Product;
 using DTO.Warehouse;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,8 +14,6 @@ public class WarehouseRepository(AppDbContext context) : IWarehouseRepository
         return await context.Warehouses
             .Include(w => w.InventoryItems)
             .ThenInclude(i => i.Product)
-            .Include(w => w.InventoryTransactions)!
-                .ThenInclude(t => t.Product)
             .OrderBy(w => w.Name)
             .Select(w => MapToDto(w))
             .ToListAsync();
@@ -28,8 +24,6 @@ public class WarehouseRepository(AppDbContext context) : IWarehouseRepository
         var warehouse = await context.Warehouses
             .Include(w => w.InventoryItems)
             .ThenInclude(i => i.Product)
-            .Include(w => w.InventoryTransactions)!
-                .ThenInclude(t => t.Product)
             .FirstOrDefaultAsync(w => w.Id == id);
 
         return warehouse != null ? MapToDto(warehouse) : null;
@@ -42,7 +36,6 @@ public class WarehouseRepository(AppDbContext context) : IWarehouseRepository
             Name = warehouseDto.Name,
             Location = warehouseDto.Location,
             InventoryItems = new List<Inventory>(), // Важно!
-            InventoryTransactions = new List<InventoryTransaction>(), // Важно!
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -70,15 +63,10 @@ public class WarehouseRepository(AppDbContext context) : IWarehouseRepository
     {
         var warehouse = await context.Warehouses
             .Include(w => w.InventoryItems)
-            .Include(w => w.InventoryTransactions)
             .FirstOrDefaultAsync(w => w.Id == id);
 
         if (warehouse == null) return false;
-
-        // Проверка на наличие связанных записей
-        if (warehouse.InventoryItems.Any() || warehouse.InventoryTransactions.Any())
-            return false; // Или throw new InvalidOperationException()
-
+        
         context.Warehouses.Remove(warehouse);
         await context.SaveChangesAsync();
 
@@ -108,7 +96,6 @@ public class WarehouseRepository(AppDbContext context) : IWarehouseRepository
             return new WarehouseDto
             {
                 InventoryItems = new List<InventoryShortDto>(),
-                InventoryTransactions = Enumerable.Empty<InventoryTransactionShortDto>()
             };
         }
 
@@ -124,25 +111,12 @@ public class WarehouseRepository(AppDbContext context) : IWarehouseRepository
                 }).ToList()
             : new List<InventoryShortDto>();
 
-        // Безопасное преобразование InventoryTransactions
-        var inventoryTransactions = warehouse.InventoryTransactions != null
-            ? warehouse.InventoryTransactions
-                .Where(t => t != null)
-                .Select(t => new InventoryTransactionShortDto
-                {
-                    Id = t.Id,
-                    Quantity = t.Quantity,
-                    TransactionDate = t.TransactionDate,
-                })
-            : Enumerable.Empty<InventoryTransactionShortDto>();
-
         return new WarehouseDto
         {
             Id = warehouse.Id,
             Name = warehouse.Name ?? string.Empty,
             Location = warehouse.Location ?? string.Empty,
             InventoryItems = inventoryItems,
-            InventoryTransactions = inventoryTransactions,
             CreatedAt = warehouse.CreatedAt,
             UpdatedAt = warehouse.UpdatedAt
         };

@@ -7,5 +7,5 @@ public interface IProductRepository : IRepository<ProductDto, CreateProductDto, 
     Task<List<ProductDto>> GetByCategoryId(Guid categoryId);
     Task<List<ProductDto>> GetBySupplierId(Guid supplierId);
     Task<int> GetTotalStockQuantity(Guid productId);
-    Task<List<ProductWithStockDto>> GetProductsWithStockInfo();
+    
 }

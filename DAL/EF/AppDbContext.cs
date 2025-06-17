@@ -12,7 +12,6 @@ public class AppDbContext : DbContext
     }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Inventory> Inventories { get; set; }
-    public DbSet<InventoryTransaction> InventoryTransactions { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Supplier> Suppliers { get; set; }
     public DbSet<Warehouse> Warehouses { get; set; }
@@ -22,7 +21,6 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         // Применение конфигураций
         modelBuilder.ApplyConfiguration(new ProductMap());
-        modelBuilder.ApplyConfiguration(new InventoryTransactionMap());
         modelBuilder.ApplyConfiguration(new SupplierMap());
         modelBuilder.ApplyConfiguration(new WarehouseMap());
         modelBuilder.ApplyConfiguration(new CategoryMap());
@@ -47,13 +45,6 @@ public class AppDbContext : DbContext
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .ValueGeneratedOnAddOrUpdate();
         });
-        
-        modelBuilder.HasPostgresEnum<TransactionType>();
-    
-        // Настраиваем маппинг для InventoryTransaction
-        modelBuilder.Entity<InventoryTransaction>()
-            .Property(e => e.TransactionType)
-            .HasConversion<string>();  // Конвертируем enum в строку
         
     }
 }

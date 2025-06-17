@@ -8,12 +8,11 @@ public class Warehouse : BaseEntity
     public string Location { get; set; } = string.Empty;
     
     public virtual ICollection<Inventory> InventoryItems { get; set; }
-    public virtual ICollection<InventoryTransaction> InventoryTransactions { get; set; }
 
     public Warehouse()
     {
         InventoryItems = new List<Inventory>();
-        InventoryTransactions = new List<InventoryTransaction>();
+        
     }
 }
 

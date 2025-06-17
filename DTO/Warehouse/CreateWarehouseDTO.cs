@@ -1,9 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using DTO.Inventory;
-using DTO.InventoryTransaction;
 
 namespace DTO.Warehouse;
-
 public class CreateWarehouseDto
 {
     [Required]
@@ -13,6 +11,5 @@ public class CreateWarehouseDto
     public string Location { get; set; } = string.Empty;
     
     public List<CreateInventoryDto> InventoryItems { get; set; } = new(); // Инициализация по умолчанию
-    
-    public List<CreateInventoryTransactionDto> InventoryTransactions { get; set; } = new();
+  
 }

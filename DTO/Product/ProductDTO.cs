@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using DTO.Category;
 using DTO.Inventory;
-using DTO.InventoryTransaction;
 using DTO.Supplier;
 
 namespace DTO.Product;
@@ -22,7 +21,6 @@ public class ProductDto
     
     // Навигационное свойство к остаткам
     public List<InventoryShortDto> InventoryRecords { get; set; } = new();
-    public List<InventoryTransactionDto>? InventoryTransactions { get; set; } 
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }

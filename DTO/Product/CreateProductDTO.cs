@@ -18,7 +18,4 @@ public class CreateProductDto
     [Required]
     public Guid? SupplierId { get; set; }
     
-    
-    //public List<Guid> InventoryIds { get; set; } = new();
-    //public IEnumerable<Guid>? InventoryTransactionIds { get; set; } 
 }

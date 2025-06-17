@@ -9,7 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace InventoryWarehouseAPI.Controllers;
 
-[Route("auth")]
+[Route("api/[controller]")]
 [ApiController]
 public class AuthController : ControllerBase
 {
