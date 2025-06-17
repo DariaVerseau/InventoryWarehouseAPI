@@ -2,6 +2,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using DAL.EF;
+using DAL.Entities;
+using DTO.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace InventoryWarehouseAPI.Controllers;
 
-[Route("api/[controller]")]
+[Route("auth")]
 [ApiController]
 public class AuthController : ControllerBase
 {
@@ -23,79 +25,39 @@ public class AuthController : ControllerBase
         _context = context;
         _config = config;
     }
-
-    [Authorize(Roles = "Admin")]
+    
+    [Authorize]
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
         // Проверка на существующего пользователя
-        if (await _context.Users.AnyAsync(u => u.Email == model.Email || u.Username == model.Username))
-            return BadRequest("Пользователь с таким email или логином уже существует");
+        if (await _context.Users.AnyAsync(u => u.Email == model.Email))
+            return BadRequest("Пользователь с таким email уже существует");
 
         // Создание пользователя
         var user = new User
         {
-            Username = model.Username,
             Email = model.Email,
-            PasswordHash = HashPassword(model.Password),
-            Role = model.Role ?? "User" // По умолчанию обычный пользователь
+            PasswordHash = HashPassword(model.Password) // Реализуйте хэширование
         };
 
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        return Ok(new UserResponseDto
-        {
-            Id = user.Id,
-            Username = user.Username,
-            Email = user.Email,
-            Role = user.Role
-        });
+        return Ok("Пользователь успешно зарегистрирован");
     }
 
-    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
         var user = await _context.Users
-            .FirstOrDefaultAsync(u => u.Username == model.Username || u.Email == model.Username);
+            .FirstOrDefaultAsync(u => u.Email == model.Email);
 
         if (user == null || !VerifyPassword(model.Password, user.PasswordHash))
-            return Unauthorized(new { Message = "Неверный логин/email или пароль" });
+            return Unauthorized("Неверный email или пароль");
 
         var token = GenerateJwtToken(user);
-        
-        return Ok(new AuthResponseDto
-        {
-            Token = token,
-            Expires = DateTime.UtcNow.AddHours(1),
-            User = new UserResponseDto
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                Role = user.Role
-            }
-        });
-    }
-
-    [Authorize]
-    [HttpGet("profile")]
-    public async Task<IActionResult> GetProfile()
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var user = await _context.Users.FindAsync(Guid.Parse(userId));
-
-        if (user == null)
-            return NotFound();
-
-        return Ok(new UserResponseDto
-        {
-            Id = user.Id,
-            Username = user.Username,
-            Email = user.Email,
-            Role = user.Role
-        });
+        return Ok(new { token });
     }
 
     private string GenerateJwtToken(User user)
@@ -103,17 +65,19 @@ public class AuthController : ControllerBase
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Name, user.Username),
             new(ClaimTypes.Email, user.Email),
-            new(ClaimTypes.Role, user.Role)
+            // Добавьте другие claims по необходимости
+            // new(ClaimTypes.Role, "Admin")
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+        var key = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(_config["JWT:Key"]!));
+        
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: _config["Jwt:Issuer"],
-            audience: _config["Jwt:Audience"],
+            issuer: _config["JWT:Issuer"],
+            audience: _config["JWT:Audience"],
             claims: claims,
             expires: DateTime.UtcNow.AddHours(1),
             signingCredentials: creds);
@@ -123,11 +87,13 @@ public class AuthController : ControllerBase
 
     private static string HashPassword(string password)
     {
-        return BCrypt.Net.BCrypt.HashPassword(password, BCrypt.Net.BCrypt.GenerateSalt(12));
+        // Реализуйте хэширование пароля (например, с помощью BCrypt)
+        return BCrypt.Net.BCrypt.HashPassword(password);
     }
 
     private static bool VerifyPassword(string password, string hash)
     {
+        // Проверка хэша пароля
         return BCrypt.Net.BCrypt.Verify(password, hash);
     }
 }

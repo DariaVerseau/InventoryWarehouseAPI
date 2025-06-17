@@ -25,6 +25,7 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new WarehouseMap());
         modelBuilder.ApplyConfiguration(new CategoryMap());
         modelBuilder.ApplyConfiguration(new InventoryMap());
+        modelBuilder.ApplyConfiguration(new UserMap());
         modelBuilder.Entity<Category>().HasData(
             new Category { 
                 Id = Guid.Parse("a2d3b4c5-6f7e-8d9c-0b1a-2d3e4f5a6b7c"), 
