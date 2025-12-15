@@ -13,9 +13,9 @@ public class CreateProductDto
     [Required]
     public int TotalQuantity { get; set; }
     [Required]
-    public Guid? CategoryId { get; set; }
+    public Guid CategoryId { get; set; }
     
     [Required]
-    public Guid? SupplierId { get; set; }
+    public Guid SupplierId { get; set; }
     
 }

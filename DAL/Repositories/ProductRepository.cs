@@ -1,138 +1,66 @@
 using DAL.EF;
 using DAL.Entities;
+using DAL.Helpers;
 using DAL.Interfaces;
-using DTO.Product;
-using DTO.Category;
-using DTO.Supplier;
-using DTO.Inventory;
 using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Repositories;
 
-public class ProductRepository(AppDbContext context) : IProductRepository
+public class ProductRepository : Repository<Product>, IProductRepository
 {
-    private IQueryable<Product> BaseQuery => context.Products
-        .AsNoTracking()
-        .Include(p => p.Category)
-        .Include(p => p.Supplier)
-        .Include(p => p.InventoryRecords);
+    public ProductRepository(AppDbContext context) : base(context) { }
 
-    public async Task<List<ProductDto>> GetAll()
+    private IQueryable<Product> GetBaseQuery()
     {
-        return await BaseQuery
-            .OrderBy(p => p.Name)
-            .Select(p => MapToDto(p))
-            .ToListAsync();
+        return _dbSet
+            .Include(p => p.Category)
+            .Include(p => p.Supplier)
+            .Include(p => p.InventoryRecords)
+            .ThenInclude(i => i.Warehouse);
     }
 
-    public async Task<ProductDto?> GetById(Guid id)
+    public async Task<List<Product>> GetAllWithDetailsAsync()
     {
-        return await BaseQuery
-            .Where(p => p.Id == id)
-            .Select(p => MapToDto(p))
-            .FirstOrDefaultAsync();
+        return await GetBaseQuery().OrderBy(p => p.Name).ToListAsync();
     }
 
-    public async Task<ProductDto> Create(CreateProductDto productDto)
+    public async Task<Product?> GetByIdWithDetailsAsync(Guid id)
     {
-        var product = new Product
-        {
-            Name = productDto.Name,
-            Unit = productDto.Unit,
-            TotalQuantity = productDto.TotalQuantity,
-            CategoryId = productDto.CategoryId,
-            SupplierId = productDto.SupplierId,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-            IsVisible = true // Добавляем значение по умолчанию
-        };
-
-        context.Products.Add(product);
-        await context.SaveChangesAsync();
-
-        return MapToDto(product);
+        return await GetBaseQuery().FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public async Task<ProductDto?> Update(UpdateProductDto productDto)
+    public async Task<List<Product>> GetByCategoryIdAsync(Guid categoryId)
     {
-        var product = await context.Products
-            .FirstOrDefaultAsync(p => p.Id == productDto.Id);
-            
-        if (product == null) return null;
-
-        product.Name = productDto.Name;
-        product.Unit = productDto.Unit;
-        product.TotalQuantity = productDto.TotalQuantity;
-        product.CategoryId = productDto.CategoryId;
-        product.SupplierId = productDto.SupplierId;
-        product.IsVisible = productDto.IsVisible;
-        product.UpdatedAt = DateTime.UtcNow;
-
-        await context.SaveChangesAsync();
-        return await GetById(product.Id);
-    }
-
-    public async Task<bool> Delete(Guid id)
-    {
-        var product = await context.Products.FindAsync(id);
-        if (product == null) return false;
-
-        context.Products.Remove(product);
-        return await context.SaveChangesAsync() > 0;
-    }
-
-    public async Task<List<ProductDto>> GetByCategoryId(Guid categoryId)
-    {
-        return await BaseQuery
+        return await GetBaseQuery()
             .Where(p => p.CategoryId == categoryId)
-            .Select(p => MapToDto(p))
+            .OrderBy(p => p.Name)
             .ToListAsync();
     }
 
-    public async Task<List<ProductDto>> GetBySupplierId(Guid supplierId)
+    public async Task<List<Product>> GetBySupplierIdAsync(Guid supplierId)
     {
-        return await BaseQuery
+        return await GetBaseQuery()
             .Where(p => p.SupplierId == supplierId)
-            .Select(p => MapToDto(p))
+            .OrderBy(p => p.Name)
             .ToListAsync();
     }
 
-    public async Task<int> GetTotalStockQuantity(Guid productId)
+    public async Task<int> GetTotalStockQuantityAsync(Guid productId)
     {
-        return await context.Inventories
+        return await _context.Set<Inventory>()
             .AsNoTracking()
             .Where(i => i.ProductId == productId)
             .SumAsync(i => i.Quantity);
     }
-
-    private static ProductDto MapToDto(Product product)
+    
+    public async Task<(List<Product> Items, long TotalCount)> GetPagedAsync(int page, int pageSize)
     {
-        return new ProductDto
-        {
-            Id = product.Id,
-            Name = product.Name,
-            Unit = product.Unit,
-            TotalQuantity = product.TotalQuantity,
-            Category = product.Category != null ? new CategoryShortDto
-            {
-                Id = product.Category.Id,
-                Name = product.Category.Name
-            } : null,
-            Supplier = product.Supplier != null ? new SupplierShortDto
-            {
-                Id = product.Supplier.Id,
-                Name = product.Supplier.Name
-            } : null,
-            InventoryRecords = product.InventoryRecords?
-                .Select(i => new InventoryShortDto
-                {
-                    WarehouseId = i.WarehouseId,
-                    WarehouseName = i.Warehouse?.Name,
-                    Quantity = i.Quantity
-                }).ToList() ?? new List<InventoryShortDto>(),
-            CreatedAt = product.CreatedAt,
-            UpdatedAt = product.UpdatedAt,
-            IsVisible = product.IsVisible
-        };
+        var query = _dbSet
+            .Include(p => p.Category)
+            .Include(p => p.Supplier)
+            .AsNoTracking()
+            .OrderBy(p => p.Name);
+
+        return await PaginationHelper.PaginateAsync(query, page, pageSize);
     }
 }

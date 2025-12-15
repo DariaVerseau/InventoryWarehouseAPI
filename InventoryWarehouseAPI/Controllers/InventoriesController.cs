@@ -1,5 +1,7 @@
 using BLL.Interfaces;
 using DTO.Inventory;
+using DTO.PagedResponse;
+using DTO.Product;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -13,6 +15,18 @@ public class InventoriesController : ControllerBase
     public InventoriesController(IInventoryService inventoryService)
     {
         _inventoryService = inventoryService;
+    }
+    
+    [HttpGet("inventories")]
+    public async Task<ActionResult<PagedResponse<ProductDto>>> GetProducts(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
+    {
+        if (page < 1) page = 1;
+        if (pageSize is < 1 or > 50) pageSize = 10;
+
+        var result = await _inventoryService.GetInventoriesPaged(page, pageSize);
+        return Ok(result);
     }
 
     // Базовые CRUD-операции

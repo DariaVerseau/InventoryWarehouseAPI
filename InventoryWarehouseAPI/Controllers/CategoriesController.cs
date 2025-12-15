@@ -1,5 +1,7 @@
 using BLL.Interfaces;
 using DTO.Category;
+using DTO.PagedResponse;
+using DTO.Product;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -13,6 +15,18 @@ public class CategoriesController : ControllerBase
     public CategoriesController(ICategoryService categoryService)
     {
         _categoryService = categoryService;
+    }
+    
+    [HttpGet("categories")]
+    public async Task<ActionResult<PagedResponse<CategoryDto>>> GetProducts(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
+    {
+        if (page < 1) page = 1;
+        if (pageSize is < 1 or > 50) pageSize = 10;
+
+        var result = await _categoryService.GetCategoriesPaged(page, pageSize);
+        return Ok(result);
     }
 
     [HttpGet]

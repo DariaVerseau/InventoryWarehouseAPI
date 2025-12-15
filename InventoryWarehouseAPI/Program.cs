@@ -44,9 +44,8 @@ builder.Services.AddAuthorization();
     
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-//
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 // Регистрация репозиториев
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();

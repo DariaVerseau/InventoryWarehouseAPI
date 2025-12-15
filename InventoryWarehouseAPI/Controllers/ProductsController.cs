@@ -1,5 +1,7 @@
 using BLL.Interfaces;
+using DAL.Entities;
 using DTO.Product;
+using DTO.PagedResponse;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -15,38 +17,44 @@ public class ProductsController : ControllerBase
         _productService = productService;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<ProductDto>>> GetAll()
+    [HttpGet("products")]
+    public async Task<ActionResult<PagedResponse<ProductDto>>> GetProducts(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
     {
-        var products = await _productService.GetProducts();
-        return Ok(products);
+        if (page < 1) page = 1;
+        if (pageSize is < 1 or > 50) pageSize = 10;
+
+        var result = await _productService.GetProductsPaged(page, pageSize);
+        return Ok(result);
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<ProductDto>> GetById(Guid id)
+    public async Task<ActionResult<Product>> GetById(Guid id)
     {
-        var product = await _productService.GetProduct(id);
-        return Ok(product);
+        var inventory = await _productService.GetById(id);
+        return Ok(inventory);
     }
+
 
     [HttpPost]
     public async Task<ActionResult<ProductDto>> Create([FromBody] CreateProductDto createProductDto)
     {
-        var createdProduct = await _productService.CreateProduct(createProductDto);
+        var createdProduct = await _productService.Create(createProductDto);
         return CreatedAtAction(nameof(GetById), new { id = createdProduct.Id }, createdProduct);
     }
 
     [HttpPut]
     public async Task<ActionResult<ProductDto>> Update([FromBody] UpdateProductDto updateProductDto)
     {
-        var updatedProduct = await _productService.UpdateProduct(updateProductDto);
+        var updatedProduct = await _productService.Update(updateProductDto);
         return Ok(updatedProduct);
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        await _productService.DeleteProduct(id);
+        await _productService.Delete(id);
         return NoContent();
     }
 }

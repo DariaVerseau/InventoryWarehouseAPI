@@ -1,4 +1,5 @@
 using DTO.Category;
+using DTO.PagedResponse;
 
 namespace BLL.Interfaces;
 
@@ -9,4 +10,5 @@ public interface ICategoryService
     Task<CategoryDto> CreateCategory(CreateCategoryDto category);
     Task<CategoryDto> UpdateCategory(UpdateCategoryDto category);
     Task DeleteCategory(Guid id);
+    Task<PagedResponse<CategoryDto>> GetCategoriesPaged(int page, int pageSize);
 }

@@ -1,125 +1,95 @@
 using DAL.EF;
 using DAL.Entities;
 using DAL.Interfaces;
-using DTO.Inventory;
-using DTO.Product;
-using DTO.Warehouse;
 using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Repositories;
 
-public class InventoryRepository(AppDbContext context) : IInventoryRepository
+public class InventoryRepository : Repository<Inventory>, IInventoryRepository
 {
-    public async Task<List<InventoryDto>> GetAll()
+    public InventoryRepository(AppDbContext context) : base(context) { }
+
+
+    /// Получает все записи Inventory с загруженными связями Product и Warehouse.
+    /// Используется, когда нужны данные для маппинга в InventoryDto.
+
+    public async Task<List<Inventory>> GetAllWithDetails()
     {
-        var inventories = await context.Inventories
+        return await _dbSet
             .Include(i => i.Product)
             .Include(i => i.Warehouse)
             .ToListAsync();
-
-        return inventories.Select(MapToDto).ToList();
     }
-
-    public async Task<InventoryDto?> GetById(Guid id)
+    
+    public async Task<List<Inventory>> GetByProductId(Guid productId)
     {
-        var inventory = await context.Inventories
+        return await _dbSet
             .Include(i => i.Product)
-            .Include(i => i.Warehouse)
-            .FirstOrDefaultAsync(i => i.Id == id);
-
-        return inventory != null ? MapToDto(inventory) : null;
-    }
-
-    public async Task<InventoryDto> Create(CreateInventoryDto inventoryDto)
-    {
-        var inventory = new Inventory
-        {
-            ProductId = inventoryDto.ProductId,
-            WarehouseId = inventoryDto.WarehouseId,
-            Quantity = inventoryDto.Quantity,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-        };
-
-        context.Inventories.Add(inventory);
-        await context.SaveChangesAsync();
-
-        return MapToDto(inventory);
-    }
-
-    public async Task<InventoryDto> Update(UpdateInventoryDto inventoryDto)
-    {
-        var inventory = await context.Inventories.FindAsync(inventoryDto.Id);
-        if (inventory == null) return null;
-
-        inventory.ProductId = inventoryDto.ProductId;
-        inventory.WarehouseId = inventoryDto.WarehouseId;
-        inventory.Quantity = inventoryDto.Quantity;
-        inventory.UpdatedAt = DateTime.UtcNow;
-
-        await context.SaveChangesAsync();
-
-        return await GetById(inventory.Id);
-    }
-
-    public async Task<bool> Delete(Guid id)
-    {
-        var inventory = await context.Inventories.FindAsync(id);
-        if (inventory == null) return false;
-
-        context.Inventories.Remove(inventory);
-        await context.SaveChangesAsync();
-
-        return true;
-    }
-
-    public async Task<List<InventoryDto>> GetByProductId(Guid productId)
-    {
-        var inventories = await context.Inventories
             .Include(i => i.Warehouse)
             .Where(i => i.ProductId == productId)
             .ToListAsync();
-
-        return inventories.Select(MapToDto).ToList();
     }
-
-    public async Task<List<InventoryDto>> GetByWarehouseId(Guid warehouseId)
-    {
-        var inventories = await context.Inventories
-            .Include(i => i.Product)
-            .Where(i => i.WarehouseId == warehouseId)
-            .ToListAsync();
-
-        return inventories.Select(MapToDto).ToList();
-    }
-
     public async Task<int> GetTotalQuantity(Guid productId)
     {
-        return await context.Inventories
+        return await _dbSet
             .Where(i => i.ProductId == productId)
             .SumAsync(i => i.Quantity);
     }
 
-    private static InventoryDto MapToDto(Inventory inventory)
+    /// Получает все записи Inventory для указанного склада с полными данными.
+
+    public async Task<List<Inventory>> GetByWarehouseId(Guid warehouseId)
     {
-        return new InventoryDto
-        {
-            Id = inventory.Id,
-            Quantity = inventory.Quantity,
-            Product = inventory.Product != null ? new ProductShortDto
-            {
-                Id = inventory.Product.Id,
-                Name = inventory.Product.Name,
-                Unit = inventory.Product.Unit
-            } : null,
-            Warehouse = inventory.Warehouse != null ? new WarehouseShortDto
-            {
-                Id = inventory.Warehouse.Id,
-                Name = inventory.Warehouse.Name,
-                Location = inventory.Warehouse.Location
-            } : null,
-            CreatedAt = inventory.CreatedAt,
-            UpdatedAt = inventory.UpdatedAt
-        };
+        return await _dbSet
+            .Include(i => i.Product)
+            .Include(i => i.Warehouse)
+            .Where(i => i.WarehouseId == warehouseId)
+            .ToListAsync();
+    }
+
+
+    /// Получает запись Inventory по комбинации ProductId и WarehouseId.
+  
+    public async Task<Inventory?> GetByProductAndWarehouse(Guid productId, Guid warehouseId)
+    {
+        return await _dbSet
+            .FirstOrDefaultAsync(i => i.ProductId == productId && i.WarehouseId == warehouseId);
+    }
+
+    
+    /// Удаляет все записи Inventory для указанного товара (например, при удалении Product).
+    
+    public async Task DeleteByProductId(Guid productId)
+    {
+        var inventories = await _dbSet.Where(i => i.ProductId == productId).ToListAsync();
+        _dbSet.RemoveRange(inventories);
+        await _context.SaveChangesAsync();
+    }
+
+
+    /// Удаляет все записи Inventory для указанного склада (например, при удалении Warehouse).
+    
+    public async Task DeleteByWarehouseId(Guid warehouseId)
+    {
+        var inventories = await _dbSet.Where(i => i.WarehouseId == warehouseId).ToListAsync();
+        _dbSet.RemoveRange(inventories);
+        await _context.SaveChangesAsync();
+    }
+    
+    public async Task<(List<Inventory> Items, long TotalCount)> GetPagedAsync(int page, int pageSize)
+    {
+        var query = _dbSet
+            .Include(i => i.Product)
+            .Include(i => i.Warehouse)
+            .AsNoTracking()
+            .OrderBy(i => i.Product!.Name); // сортировка по имени товара
+
+        var totalCount = await query.CountAsync();
+        var items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
     }
 }

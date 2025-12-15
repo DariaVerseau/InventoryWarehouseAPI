@@ -1,10 +1,12 @@
 using DAL.Entities;
-using DTO.Supplier;
 
 namespace DAL.Interfaces;
 
-public interface ISupplierRepository : IRepository<SupplierDto, CreateSupplierDto, UpdateSupplierDto>
+public interface ISupplierRepository : IRepository<Supplier>
 {
-    Task<List<SupplierDto>> SearchByName(string searchTerm);
-    Task<bool> HasProducts(Guid supplierId);
+    Task<List<Supplier>> GetAllWithProductsAsync();
+    Task<Supplier?> GetByIdWithProductsAsync(Guid id);
+    Task<Supplier?> GetByEmailAsync(string email);
+    Task<bool> ExistsAsync(Guid id);
+    Task<(List<Supplier> Items, long TotalCount)> GetPagedAsync(int page, int pageSize);
 }

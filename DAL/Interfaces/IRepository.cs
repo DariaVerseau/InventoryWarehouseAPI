@@ -1,11 +1,11 @@
 
 namespace DAL.Interfaces;
 
-public interface IRepository<T, in TC, in TU>
+public interface IRepository<T> where T : class
 {
     Task<List<T>> GetAll();
     Task<T> GetById(Guid id);
-    Task<T> Create(TC book);
-    Task<T> Update(TU book);
+    Task<T> Create(T entity);
+    Task<T> Update(T entity);
     Task<bool> Delete(Guid id);
 }

@@ -1,11 +1,15 @@
 using DAL.Entities;
-using DTO.Inventory;
 
 namespace DAL.Interfaces;
 
-public interface IInventoryRepository : IRepository<InventoryDto, CreateInventoryDto, UpdateInventoryDto>
+public interface IInventoryRepository : IRepository<Inventory>
 {
-    Task<List<InventoryDto>> GetByProductId(Guid productId);
+    Task<List<Inventory>> GetAllWithDetails();
+    Task<List<Inventory>> GetByWarehouseId(Guid warehouseId);
+    Task<List<Inventory>> GetByProductId(Guid productId);
+    Task<Inventory?> GetByProductAndWarehouse(Guid productId, Guid warehouseId);
+    Task DeleteByProductId(Guid productId);
+    Task DeleteByWarehouseId(Guid warehouseId);
     Task<int> GetTotalQuantity(Guid productId);
-    Task<List<InventoryDto>> GetByWarehouseId(Guid warehouseId);
+    Task<(List<Inventory> Items, long TotalCount)> GetPagedAsync(int page, int pageSize);
 }
