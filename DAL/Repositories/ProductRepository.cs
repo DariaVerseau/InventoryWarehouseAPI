@@ -53,6 +53,54 @@ public class ProductRepository : Repository<Product>, IProductRepository
             .SumAsync(i => i.Quantity);
     }
     
+    public async Task<(List<Product> Items, long TotalCount)> GetFilteredAsync(
+        string? search,
+        Guid? categoryId,
+        Guid? supplierId,
+        bool? isVisible,
+        string? sortBy,
+        int page,
+        int pageSize)
+    {
+        var query = _dbSet
+            .Include(p => p.Category)
+            .Include(p => p.Supplier)
+            .AsNoTracking();
+
+        //Фильтрация
+        if (!string.IsNullOrWhiteSpace(search))
+            query = query.Where(p => p.Name.Contains(search) || p.Description.Contains(search));
+    
+        if (categoryId.HasValue)
+            query = query.Where(p => p.CategoryId == categoryId.Value);
+    
+        if (supplierId.HasValue)
+            query = query.Where(p => p.SupplierId == supplierId.Value);
+    
+        if (isVisible.HasValue)
+            query = query.Where(p => p.IsVisible == isVisible.Value);
+
+        //Общее количество ДО пагинации
+        var totalCount = await query.CountAsync();
+
+        //Сортировка
+        query = sortBy?.ToLower() switch
+        {
+            "name desc" => query.OrderByDescending(p => p.Name),
+            "createdAt" => query.OrderBy(p => p.CreatedAt),
+            "createdAt desc" => query.OrderByDescending(p => p.CreatedAt),
+            _ => query.OrderBy(p => p.Name) // по умолчанию
+        };
+
+        // Пагинация
+        var items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
+    
     public async Task<(List<Product> Items, long TotalCount)> GetPagedAsync(int page, int pageSize)
     {
         var query = _dbSet

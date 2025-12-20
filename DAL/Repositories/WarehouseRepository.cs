@@ -48,6 +48,46 @@ public class WarehouseRepository : Repository<Warehouse>, IWarehouseRepository
     {
         return await _dbSet.AnyAsync(w => w.Id == id);
     }
+    public async Task<(List<Warehouse> Items, long TotalCount)> GetFilteredAsync(
+        string? search,
+        string? sortBy,
+        int page,
+        int pageSize)
+    {
+        var query = _dbSet
+            .Include(w => w.InventoryItems)
+            .ThenInclude(i => i.Product)
+            .AsNoTracking();
+
+        //Фильтрация
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            search = search.Trim().ToLower();
+            query = query.Where(w =>
+                w.Name.ToLower().Contains(search) ||
+                w.Location.ToLower().Contains(search));
+        }
+
+        //Общее количество
+        var totalCount = await query.CountAsync();
+
+        //Сортировка
+        query = sortBy?.ToLower() switch
+        {
+            "name desc" => query.OrderByDescending(w => w.Name),
+            "location" => query.OrderBy(w => w.Location),
+            "location desc" => query.OrderByDescending(w => w.Location),
+            _ => query.OrderBy(w => w.Name)
+        };
+
+        //Пагинация
+        var items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
     
     public async Task<(List<Warehouse> Items, long TotalCount)> GetPagedAsync(int page, int pageSize)
     {

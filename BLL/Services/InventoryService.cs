@@ -106,6 +106,31 @@ public class InventoryService : IInventoryService
             PageSize = pageSize
         };
     }
+    
+    public async Task<PagedResponse<InventoryDto>> GetFilteredInventory(InventoryFilterDto filter)
+    {
+        if (filter.Page < 1) filter.Page = 1;
+        if (filter.PageSize < 1 || filter.PageSize > 50) filter.PageSize = 10;
+
+        var (inventories, totalCount) = await _inventoryRepo.GetFilteredAsync(
+            productName: filter.ProductName,
+            productId: filter.ProductId,
+            warehouseId: filter.WarehouseId,
+            minQuantity: filter.MinQuantity,
+            maxQuantity: filter.MaxQuantity,
+            sortBy: filter.SortBy,
+            page: filter.Page,
+            pageSize: filter.PageSize
+        );
+
+        return new PagedResponse<InventoryDto>
+        {
+            Items = inventories.Select(MapToDto).ToList(),
+            TotalCount = totalCount,
+            Page = filter.Page,
+            PageSize = filter.PageSize
+        };
+    }
 
     //Маппинг сущности → DTO
     private InventoryDto MapToDto(DAL.Entities.Inventory inventory)

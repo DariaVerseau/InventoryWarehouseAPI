@@ -17,7 +17,7 @@ public class ProductsController : ControllerBase
         _productService = productService;
     }
 
-    [HttpGet("products")]
+    [HttpGet]
     public async Task<ActionResult<PagedResponse<ProductDto>>> GetProducts(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10)
@@ -35,7 +35,13 @@ public class ProductsController : ControllerBase
         var inventory = await _productService.GetById(id);
         return Ok(inventory);
     }
-
+    
+    [HttpGet("filtered")]
+    public async Task<ActionResult<PagedResponse<ProductDto>>> GetFiltered([FromQuery] ProductFilterDto filter)
+    {
+        var result = await _productService.GetFilteredProducts(filter);
+        return Ok(result);
+    }
 
     [HttpPost]
     public async Task<ActionResult<ProductDto>> Create([FromBody] CreateProductDto createProductDto)

@@ -43,6 +43,13 @@ public class InventoriesController : ControllerBase
         var inventory = await _inventoryService.GetInventory(id);
         return Ok(inventory);
     }
+    
+    [HttpGet("filtered")]
+    public async Task<ActionResult<PagedResponse<InventoryDto>>> GetFiltered([FromQuery] InventoryFilterDto filter)
+    {
+        var result = await _inventoryService.GetFilteredInventory(filter);
+        return Ok(result);
+    }
 
     [HttpPost]
     public async Task<ActionResult<InventoryDto>> Create([FromBody] CreateInventoryDto createInventoryDto)

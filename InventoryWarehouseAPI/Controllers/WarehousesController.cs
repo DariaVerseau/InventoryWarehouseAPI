@@ -42,6 +42,13 @@ public class WarehousesController : ControllerBase
         return Ok(warehouse);
     }
 
+    [HttpGet("filtered")]
+    public async Task<ActionResult<PagedResponse<WarehouseDto>>> GetFiltered([FromQuery] WarehouseFilterDto filter)
+    {
+        var result = await _warehouseService.GetFilteredWarehouses(filter);
+        return Ok(result);
+    }
+
     [HttpPost]
     public async Task<ActionResult<WarehouseDto>> Create([FromBody] CreateWarehouseDto createWarehouseDto)
     {

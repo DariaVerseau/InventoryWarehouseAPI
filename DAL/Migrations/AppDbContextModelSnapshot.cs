@@ -143,6 +143,12 @@ namespace DAL.Migrations
                         .HasDefaultValueSql("CURRENT_TIMESTAMP")
                         .HasComment("Дата создания записи");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("description");
+
                     b.Property<bool>("IsVisible")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")

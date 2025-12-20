@@ -12,6 +12,7 @@ public interface IWarehouseService
     Task<bool> Delete(Guid id);
     Task<List<WarehouseDto>> SearchByName(string searchTerm);
     Task<int> GetTotalCapacityUsed(Guid warehouseId);
+    Task<PagedResponse<WarehouseDto>> GetFilteredWarehouses(WarehouseFilterDto filter);
     Task<PagedResponse<WarehouseDto>> GetWarehousesPaged(int page, int pageSize);
     
 }

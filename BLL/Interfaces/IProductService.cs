@@ -13,5 +13,6 @@ public interface IProductService
     Task<List<ProductDto>> GetByCategoryId(Guid categoryId);
     Task<List<ProductDto>> GetBySupplierId(Guid supplierId);
     Task<int> GetTotalStockQuantity(Guid productId);
+    Task<PagedResponse<ProductDto>> GetFilteredProducts(ProductFilterDto filter);
     Task<PagedResponse<ProductDto>> GetProductsPaged(int page, int pageSize);
 }

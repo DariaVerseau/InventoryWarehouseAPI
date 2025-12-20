@@ -114,6 +114,30 @@ public class ProductService : IProductService
     {
         return await _productRepo.GetTotalStockQuantityAsync(productId);
     }
+    
+    public async Task<PagedResponse<ProductDto>> GetFilteredProducts(ProductFilterDto filter)
+    {
+        if (filter.Page < 1) filter.Page = 1;
+        if (filter.PageSize < 1 || filter.PageSize > 50) filter.PageSize = 10;
+
+        var (products, totalCount) = await _productRepo.GetFilteredAsync(
+            search: filter.Search,
+            categoryId: filter.CategoryId,
+            supplierId: filter.SupplierId,
+            isVisible: filter.IsVisible,
+            sortBy: filter.SortBy,
+            page: filter.Page,
+            pageSize: filter.PageSize
+        );
+
+        return new PagedResponse<ProductDto>
+        {
+            Items = products.Select(MapToDto).ToList(),
+            TotalCount = totalCount,
+            Page = filter.Page,
+            PageSize = filter.PageSize
+        };
+    }
 
     public async Task<(List<ProductDto> Items, long TotalCount)> GetPaged(int page, int pageSize)
     {

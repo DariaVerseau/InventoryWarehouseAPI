@@ -38,7 +38,7 @@ public class CategoryService : ICategoryService
         var category = new Category
         {
             Name = dto.Name,
-            // Id, CreatedAt — не задаём! EF заполнит сам
+            Description = dto.Description
         };
 
         var created = await _categoryRepository.Create(category);
@@ -52,7 +52,7 @@ public class CategoryService : ICategoryService
 
         existing.Name = dto.Name;
         existing.IsVisible = dto.IsVisible;
-        // UpdatedAt — EF обновит автоматически (если настроено)
+        existing.Description = dto.Description;
 
         var updated = await _categoryRepository.Update(existing);
         return MapToDto(updated);
@@ -84,6 +84,7 @@ public class CategoryService : ICategoryService
     {
         Id = category.Id,
         Name = category.Name,
+        Description = category.Description,
         IsVisible = category.IsVisible,
         CreatedAt = category.CreatedAt,
         UpdatedAt = category.UpdatedAt

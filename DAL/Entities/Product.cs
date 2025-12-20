@@ -12,6 +12,7 @@ public class Product : BaseEntity
     public Guid? SupplierId { get; set; }
     public Supplier? Supplier { get; set; }
     public int TotalQuantity { get; set; }
+    public string Description { get; set; }
     
     public bool IsVisible { get; set; }
     
@@ -61,6 +62,12 @@ public class ProductMap : IEntityTypeConfiguration<Product>
             .Property(an => an.IsVisible)
             .HasDefaultValue(true)
             .IsRequired();
+        
+        builder.Property(p => p.Description)
+            .IsRequired()
+            .HasColumnName("description")
+            .HasMaxLength(500);
+            
         
         // Настройка связи с Category
         builder.HasOne(p => p.Category)

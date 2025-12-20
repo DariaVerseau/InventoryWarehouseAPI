@@ -92,4 +92,61 @@ public class InventoryRepository : Repository<Inventory>, IInventoryRepository
 
         return (items, totalCount);
     }
+    
+    public async Task<(List<Inventory> Items, long TotalCount)> GetFilteredAsync(
+        string? productName,
+        Guid? productId,
+        Guid? warehouseId,
+        int? minQuantity,
+        int? maxQuantity,
+        string? sortBy,
+        int page,
+        int pageSize)
+    {
+        var query = _dbSet
+            .Include(i => i.Product)
+            .Include(i => i.Warehouse)
+            .AsNoTracking();
+
+        //Фильтрация
+        if (!string.IsNullOrWhiteSpace(productName))
+        {
+            productName = productName.Trim().ToLower();
+            query = query.Where(i => i.Product.Name.ToLower().Contains(productName));
+        }
+
+        if (productId.HasValue)
+            query = query.Where(i => i.ProductId == productId.Value);
+
+        if (warehouseId.HasValue)
+            query = query.Where(i => i.WarehouseId == warehouseId.Value);
+
+        if (minQuantity.HasValue)
+            query = query.Where(i => i.Quantity >= minQuantity.Value);
+
+        if (maxQuantity.HasValue)
+            query = query.Where(i => i.Quantity <= maxQuantity.Value);
+
+        //Общее количество
+        var totalCount = await query.CountAsync();
+
+        //Сортировка
+        query = sortBy?.ToLower() switch
+        {
+            "productName desc" => query.OrderByDescending(i => i.Product.Name),
+            "warehouseName" => query.OrderBy(i => i.Warehouse.Name),
+            "warehouseName desc" => query.OrderByDescending(i => i.Warehouse.Name),
+            "quantity" => query.OrderBy(i => i.Quantity),
+            "quantity desc" => query.OrderByDescending(i => i.Quantity),
+            _ => query.OrderBy(i => i.Product.Name)
+        };
+
+        //Пагинация
+        var items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
 }

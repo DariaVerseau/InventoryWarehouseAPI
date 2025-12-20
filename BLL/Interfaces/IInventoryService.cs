@@ -16,4 +16,5 @@ public interface IInventoryService
 
     Task<List<InventoryDto>> GetByWarehouseId(Guid warehouseId);
     Task<PagedResponse<InventoryDto>> GetInventoriesPaged(int page, int pageSize);
+    Task<PagedResponse<InventoryDto>> GetFilteredInventory(InventoryFilterDto filter);
 }
