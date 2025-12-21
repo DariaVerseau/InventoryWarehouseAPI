@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Админка — Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+<!-- Навигация -->
+<nav class="bg-blue-800 text-white p-4">
+    <div class="container mx-auto flex flex-wrap gap-4">
+        <a href="dashboard.html" class="font-bold underline">Главная</a>
+        <a href="warehouses.html">Склады</a>
+        <a href="categories.html">Категории</a>
+    </div>
+</nav>
+
+<!-- Контент -->
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Панель управления складом</h1>
+
+    <!-- Статистика -->
+    <div class="bg-white p-6 rounded shadow mb-8">
+        <p class="text-gray-600">Добро пожаловать! Здесь вы можете управлять складами и категориями товаров.</p>
+    </div>
+
+    <!-- Быстрый доступ -->
+    <div>
+        <h2 class="text-xl font-semibold mb-4">Быстрое создание</h2>
+        <div class="flex flex-wrap gap-3">
+            <a href="warehouse-create.html" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">+ Новый склад</a>
+            <a href="category-create.html" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">+ Новая категория</a>
+        </div>
+    </div>
+</div>
+
+<!-- Уведомления -->
+<div id="toast-container" class="fixed top-4 right-4 space-y-2 z-50"></div>
+
+<script>
+    window.showToast = (msg, type = 'success') => {
+        const colors = { success: 'green', error: 'red', warning: 'yellow' };
+        const toast = document.createElement('div');
+        toast.className = `bg-${colors[type]}-100 border-l-4 border-${colors[type]}-500 text-${colors[type]}-700 p-3 rounded shadow`;
+        toast.innerHTML = `<p>${msg}</p>`;
+        document.getElementById('toast-container').appendChild(toast);
+        setTimeout(() => toast.remove(), 5000);
+    };
+</script>
+</body>
+</html>

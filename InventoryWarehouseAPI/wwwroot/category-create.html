@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Новая категория</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+<nav class="bg-green-800 text-white p-4">
+    <div class="container mx-auto flex gap-4">
+        <a href="dashboard.html" class="font-bold">Главная</a>
+        <a href="categories.html">Категории</a>
+    </div>
+</nav>
+
+<div class="container mx-auto p-6 max-w-2xl">
+    <h1 class="text-2xl font-bold mb-6">Создать новую категорию</h1>
+
+    <form id="form" class="bg-white p-6 rounded shadow">
+        <div class="mb-4">
+            <label class="block text-gray-700 font-medium mb-2">Название *</label>
+            <input type="text" id="name" class="w-full p-2 border rounded" required minlength="2" maxlength="50" placeholder="Например, Электроника" />
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700 font-medium mb-2">Описание</label>
+            <textarea id="description" class="w-full p-2 border rounded" rows="3" maxlength="500" placeholder="Краткое описание категории"></textarea>
+        </div>
+        <div class="mb-6 flex items-center">
+            <input type="checkbox" id="isVisible" class="mr-2" checked />
+            <label for="isVisible" class="text-gray-700 font-medium">Категория видима для пользователей</label>
+        </div>
+        <div class="flex gap-4">
+            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Создать</button>
+            <a href="categories.html" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Отмена</a>
+        </div>
+    </form>
+</div>
+
+<div id="toast-container" class="fixed top-4 right-4 space-y-2 z-50"></div>
+
+<script>
+    const API = '/api';
+    window.showToast = (msg, type = 'success') => {
+        const c = { success: 'green', error: 'red', warning: 'yellow' };
+        const el = document.createElement('div');
+        el.className = `bg-${c[type]}-100 border-l-4 border-${c[type]}-500 text-${c[type]}-700 p-3 rounded`;
+        el.innerHTML = `<p>${msg}</p>`;
+        document.getElementById('toast-container').appendChild(el);
+        setTimeout(() => el.remove(), 5000);
+    };
+
+    document.getElementById('form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const dto = {
+            name: document.getElementById('name').value.trim(),
+            description: document.getElementById('description').value.trim(),
+            isVisible: document.getElementById('isVisible').checked
+        };
+
+        if (!dto.name) {
+            showToast('Укажите название категории', 'warning');
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API}/categories`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dto)
+            });
+            if (res.ok) {
+                showToast('Категория успешно создана!');
+                setTimeout(() => window.location.href = 'categories.html', 1500);
+            } else {
+                const err = await res.text();
+                showToast('Ошибка: ' + (err || 'сервер не отвечает'), 'error');
+            }
+        } catch (e) {
+            showToast('Не удалось подключиться к серверу', 'error');
+        }
+    });
+</script>
+</body>
+</html>
