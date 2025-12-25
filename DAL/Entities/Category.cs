@@ -7,8 +7,8 @@ public class Category : BaseEntity
 {
     public string Name { get; set; } = String.Empty;
     public string Description { get; set; } = String.Empty;
-    
-    public bool IsVisible { get; set; }
+
+    public bool IsVisible { get; set; } = true;
     public List<Product> Products { get; set; } = new List<Product>();
     
 }

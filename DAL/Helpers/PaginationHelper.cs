@@ -7,10 +7,10 @@ public static class PaginationHelper
     public static async Task<(List<T> Items, long TotalCount)> PaginateAsync<T>(
         IQueryable<T> query,
         int page = 1,
-        int pageSize = 10)
+        int pageSize = 5)
     {
         if (page < 1) page = 1;
-        if (pageSize < 1) pageSize = 10;
+        if (pageSize < 1) pageSize = 5;
 
         var totalCount = await query.CountAsync();
         var items = await query

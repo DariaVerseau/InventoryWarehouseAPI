@@ -1,3 +1,4 @@
+using System.Dynamic;
 using BLL.Interfaces;
 using DAL.Interfaces;
 using DTO.Category;
@@ -38,7 +39,8 @@ public class CategoryService : ICategoryService
         var category = new Category
         {
             Name = dto.Name,
-            Description = dto.Description
+            Description = dto.Description,
+            IsVisible = dto.IsVisible
         };
 
         var created = await _categoryRepository.Create(category);
@@ -50,9 +52,16 @@ public class CategoryService : ICategoryService
         var existing = await _categoryRepository.GetById(dto.Id)
             ?? throw new KeyNotFoundException($"Category with ID {dto.Id} not found.");
 
-        existing.Name = dto.Name;
-        existing.IsVisible = dto.IsVisible;
-        existing.Description = dto.Description;
+        if (dto.Name != null) 
+            existing.Name = dto.Name;
+
+        if (dto.Description != null) 
+            existing.Description = dto.Description;
+
+        if (dto.IsVisible.HasValue) 
+            existing.IsVisible = dto.IsVisible.Value;
+
+        existing.UpdatedAt = DateTime.UtcNow;
 
         var updated = await _categoryRepository.Update(existing);
         return MapToDto(updated);
@@ -67,6 +76,12 @@ public class CategoryService : ICategoryService
         await _categoryRepository.Delete(id);
     }
     
+    public async Task<List<CategoryDto>> SearchByName(string searchTerm)
+    {
+        var warehouses = await _categoryRepository.SearchByNameAsync(searchTerm);
+        return warehouses.Select(MapToDto).ToList();
+    }
+    
     public async Task<PagedResponse<CategoryDto>> GetCategoriesPaged(int page, int pageSize)
     {
         var (categories, totalCount) = await _categoryRepository.GetPagedAsync(page, pageSize);
@@ -76,6 +91,28 @@ public class CategoryService : ICategoryService
             TotalCount = totalCount,
             Page = page,
             PageSize = pageSize
+        };
+    }
+    
+    public async Task<PagedResponse<CategoryDto>> GetFilteredCategories(CategoryFilterDto filter)
+    {
+        if (filter.Page < 1) filter.Page = 1;
+        if (filter.PageSize < 1 || filter.PageSize > 50) filter.PageSize = 5;
+
+        var (categories, totalCount) = await _categoryRepository.GetFilteredAsync(
+            search: filter.Search,
+            isVisible: filter.IsVisible,
+            sortBy: filter.SortBy,
+            page: filter.Page,
+            pageSize: filter.PageSize
+        );
+
+        return new PagedResponse<CategoryDto>
+        {
+            Items = categories.Select(MapToDto).ToList(),
+            TotalCount = totalCount,
+            Page = filter.Page,
+            PageSize = filter.PageSize
         };
     }
 

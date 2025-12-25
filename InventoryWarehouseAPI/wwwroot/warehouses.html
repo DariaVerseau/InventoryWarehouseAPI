@@ -75,7 +75,7 @@
     const load = async () => {
         const search = document.getElementById('search').value || '';
         const sort = document.getElementById('sort').value || 'name';
-        const url = `${API}/warehouses/filtered?search=${encodeURIComponent(search)}&sortBy=${sort}&page=${page}&pageSize=10`;
+        const url = `${API}/warehouses/filtered?search=${encodeURIComponent(search)}&sortBy=${sort}&page=${page}&pageSize=5`;
 
         try {
             const res = await fetch(url);

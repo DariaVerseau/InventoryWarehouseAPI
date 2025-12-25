@@ -10,5 +10,7 @@ public interface ICategoryService
     Task<CategoryDto> CreateCategory(CreateCategoryDto category);
     Task<CategoryDto> UpdateCategory(UpdateCategoryDto category);
     Task DeleteCategory(Guid id);
+    Task<List<CategoryDto>> SearchByName(string searchTerm);
     Task<PagedResponse<CategoryDto>> GetCategoriesPaged(int page, int pageSize);
+    Task<PagedResponse<CategoryDto>> GetFilteredCategories(CategoryFilterDto filter);
 }

@@ -17,4 +17,5 @@ public class CategoryDto
     public DateTime UpdatedAt { get; set; }
     
     public bool IsVisible { get; set; }
+    
 }

@@ -42,7 +42,14 @@ public class CategoriesController : ControllerBase
         var category = await _categoryService.GetCategory(id);
         return Ok(category);
     }
-
+    
+    [HttpGet("filtered")]
+    public async Task<ActionResult<PagedResponse<CategoryDto>>> GetFiltered([FromQuery] CategoryFilterDto filter)
+    {
+        var result = await _categoryService.GetFilteredCategories(filter);
+        return Ok(result);
+    }
+    
     [HttpPost]
     public async Task<ActionResult<CategoryDto>> Create([FromBody] CreateCategoryDto createCategoryDto)
     {
@@ -55,6 +62,14 @@ public class CategoriesController : ControllerBase
     {
         var updatedCategory = await _categoryService.UpdateCategory(updateCategoryDto);
         return Ok(updatedCategory);
+    }
+    
+    [HttpPatch("{id:guid}")]
+    public async Task<ActionResult<CategoryDto>> UpdatePatch(Guid id, [FromBody] UpdateCategoryDto dto)
+    {
+        dto.Id = id;
+        var result = await _categoryService.UpdateCategory(dto);
+        return Ok(result);
     }
 
     [HttpDelete("{id:guid}")]

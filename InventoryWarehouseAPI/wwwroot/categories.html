@@ -40,6 +40,7 @@
                 <select id="sort" class="w-full p-2 border rounded">
                     <option value="name">Название (А-Я)</option>
                     <option value="name desc">Название (Я-А)</option>
+                    <option value="createdAt">Сначала старые</option>
                     <option value="createdAt desc">Сначала новые</option>
                 </select>
             </div>
@@ -84,7 +85,7 @@
         const search = document.getElementById('search').value || '';
         const isVisible = document.getElementById('visible-only').checked ? 'true' : '';
         const sort = document.getElementById('sort').value || 'name';
-        const url = `${API}/categories/filtered?search=${encodeURIComponent(search)}&isVisible=${isVisible}&sortBy=${sort}&page=${page}&pageSize=10`;
+        const url = `${API}/categories/filtered?search=${encodeURIComponent(search)}&isVisible=${isVisible}&sortBy=${sort}&page=${page}&pageSize=5`;
 
         try {
             const res = await fetch(url);

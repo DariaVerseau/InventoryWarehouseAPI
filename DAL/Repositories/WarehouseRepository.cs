@@ -2,6 +2,8 @@ using DAL.EF;
 using DAL.Entities;
 using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using EfCore = Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace DAL.Repositories;
 
@@ -28,13 +30,16 @@ public class WarehouseRepository : Repository<Warehouse>, IWarehouseRepository
 
     public async Task<List<Warehouse>> SearchByNameAsync(string searchTerm)
     {
-        // Для PostgreSQL
-        return await _dbSet
-            .Where(w => w.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
-            .ToListAsync();
+        if (string.IsNullOrWhiteSpace(searchTerm))
+            return new List<Warehouse>();
 
-        // Для других СУБД замени на:
-        // .Where(w => w.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+        searchTerm = searchTerm.Trim();
+        
+        // EF.Functions.ILike — работает только внутри IQueryable
+        var query = _dbSet
+            .Where(c => EfCore.EF.Functions.ILike(c.Name, $"%{searchTerm}%"));
+
+        return await query.ToListAsync(); 
     }
 
     public async Task<int> GetTotalCapacityUsedAsync(Guid warehouseId)

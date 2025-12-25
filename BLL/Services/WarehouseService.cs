@@ -86,7 +86,7 @@ public class WarehouseService : IWarehouseService
     public async Task<PagedResponse<WarehouseDto>> GetFilteredWarehouses(WarehouseFilterDto filter)
     {
         if (filter.Page < 1) filter.Page = 1;
-        if (filter.PageSize < 1 || filter.PageSize > 50) filter.PageSize = 10;
+        if (filter.PageSize < 1 || filter.PageSize > 50) filter.PageSize = 5;
 
         var (warehouses, totalCount) = await _warehouseRepo.GetFilteredAsync(
             search: filter.Search,
