@@ -31,8 +31,7 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Только видимые</label>
                 <div class="flex items-center mt-1">
-                    <input type="checkbox" id="visible-only" class="mr-2" />
-                    <span>Да</span>
+                    <label><input type="checkbox" id="visible-only" class="mr-2" />Да</label>
                 </div>
             </div>
             <div>
@@ -49,8 +48,8 @@
 
     <!-- Таблица -->
     <div class="bg-white rounded shadow overflow-hidden">
-        <table class="min-w-full divide-y">
-            <thead class="bg-gray-100">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead>
             <tr>
                 <th class="px-6 py-3 text-left font-medium text-gray-700">Название</th>
                 <th class="px-6 py-3 text-left font-medium text-gray-700">Описание</th>
@@ -70,65 +69,144 @@
 
 <script>
     const API = '/api';
-    let page = 1, totalPages = 1;
+    const API_URL = 'http://localhost:5263/api/categories/filtered';
+    const PAGE_SIZE = 5;
 
-    window.showToast = (msg, type = 'success') => {
-        const c = { success: 'green', error: 'red', warning: 'yellow' };
-        const el = document.createElement('div');
-        el.className = `bg-${c[type]}-100 border-l-4 border-${c[type]}-500 text-${c[type]}-700 p-3 rounded`;
-        el.innerHTML = `<p>${msg}</p>`;
-        document.getElementById('toast-container').appendChild(el);
-        setTimeout(() => el.remove(), 5000);
-    };
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
 
-    const load = async () => {
-        const search = document.getElementById('search').value || '';
-        const isVisible = document.getElementById('visible-only').checked ? 'true' : '';
-        const sort = document.getElementById('sort').value || 'name';
-        const url = `${API}/categories/filtered?search=${encodeURIComponent(search)}&isVisible=${isVisible}&sortBy=${sort}&page=${page}&pageSize=5`;
+    function getUrlParam(name) {
+        const params = new URLSearchParams(window.location.search);
+        return params.get(name) || '';
+    }
+
+    function updateUrl(search, isVisible, sortBy, page) {
+        const params = new URLSearchParams();
+        if (search) params.set('search', search);
+        if (isVisible) params.set('isVisible', 'true');
+        if (sortBy && sortBy !== 'name') params.set('sortBy', sortBy);
+        if (page > 1) params.set('page', page);
+        window.history.replaceState(null, '', `?${params.toString()}`);
+    }
+
+    async function loadCategories() {
+        const search = getUrlParam('search');
+        const isVisible = getUrlParam('isVisible') === 'true';
+        const sortBy = getUrlParam('sortBy') || 'name';
+        const page = parseInt(getUrlParam('page')) || 1;
+
+        // Восстанавливаем UI
+        document.getElementById('search').value = search;
+        document.getElementById('visible-only').checked = isVisible;
+        document.getElementById('sort').value = sortBy;
 
         try {
+            const params = new URLSearchParams();
+            if (search) params.set('search', search);
+            if (isVisible) params.set('isVisible', 'true'); // ← Только если true!
+            if (sortBy && sortBy !== 'name') params.set('sortBy', sortBy);
+            params.set('page', page);
+            params.set('pageSize', PAGE_SIZE);
+
+            const url = `${API_URL}?${params.toString()}`;
             const res = await fetch(url);
             const data = await res.json();
-            totalPages = data.totalPages;
 
             document.getElementById('table-body').innerHTML = data.items.map(c => `
-          <tr>
-            <td class="px-6 py-4 font-medium">${c.name}</td>
-            <td class="px-6 py-4 text-gray-600">${c.description || '—'}</td>
-            <td class="px-6 py-4">${c.isVisible ? '✅ Да' : '❌ Нет'}</td>
-            <td class="px-6 py-4">
-              <button onclick="del('${c.id}')" class="text-red-600 hover:underline text-sm">Удалить</button>
-            </td>
-          </tr>
+            <tr>
+                <td class="px-6 py-4 font-medium">${escapeHtml(c.name)}</td>
+                <td class="px-6 py-4 text-gray-600">${escapeHtml(c.description) || '—'}</td>
+                <td class="px-6 py-4">${c.isVisible ? '✅ Да' : '❌ Нет'}</td>
+                <td class="px-6 py-4">
+                    <button onclick="deleteCategory('${c.id}')" class="text-red-600 hover:underline text-sm">Удалить</button>
+                </td>
+            </tr>
         `).join('');
 
+            // Пагинация
             let pg = '';
-            for (let i = 1; i <= totalPages; i++) {
-                pg += `<button onclick="goTo(${i})" class="px-3 py-1 border rounded ${i === page ? 'bg-green-600 text-white' : ''}">${i}</button>`;
+            for (let i = 1; i <= data.totalPages; i++) {
+                pg += `<button onclick="goToPage(${i})" class="px-3 py-1 border rounded ${i === page ? 'bg-green-600 text-white' : ''}">${i}</button>`;
             }
             document.getElementById('pagination').innerHTML = pg;
-        } catch (e) {
-            showToast('Ошибка загрузки категорий', 'error');
-        }
-    };
 
-    const goTo = (p) => { page = p; load(); };
-    const del = async (id) => {
-        if (!confirm('Удалить категорию?')) return;
+        } catch (e) {
+            console.error('Ошибка загрузки:', e);
+            document.getElementById('table-body').innerHTML = `<tr><td colspan="4" class="text-center text-red-600">Ошибка загрузки</td></tr>`;
+        }
+    }
+
+    function goToPage(page) {
+        const search = document.getElementById('search').value;
+        const isVisible = document.getElementById('visible-only').checked;
+        const sortBy = document.getElementById('sort').value;
+        updateUrl(search, isVisible, sortBy, page);
+        loadCategories();
+    }
+
+    // Функции для кнопок (заглушки)
+    function editCategory(id) {
+        alert('Редактирование категории ' + id + ' — пока не реализовано');
+    }
+    async function deleteCategory(id) {
+        if (!confirm('Удалить категорию?')) {
+            return;
+        }
+
         try {
-            await fetch(`${API}/categories/${id}`, { method: 'DELETE' });
-            showToast('Категория удалена');
-            load();
-        } catch (e) {
-            showToast('Не удалось удалить', 'error');
-        }
-    };
+            // Отправляем DELETE-запрос
+            const response = await fetch(`http://localhost:5263/api/categories/${id}`, {
+                method: 'DELETE'
+            });
 
-    document.getElementById('search').addEventListener('input', load);
-    document.getElementById('visible-only').addEventListener('change', load);
-    document.getElementById('sort').addEventListener('change', load);
-    document.addEventListener('DOMContentLoaded', load);
+            if (response.ok) {
+                // Успешно удалено — обновляем список
+                await loadCategories();
+            } else {
+                alert(`Не удалось удалить категорию. Ошибка: ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Ошибка при удалении категории:', error);
+            alert('Произошла ошибка при удалении. Проверьте подключение.');
+        }
+    }
+
+    // Инициализация
+    document.addEventListener('DOMContentLoaded', () => {
+        loadCategories();
+
+        let searchTimer;
+        document.getElementById('search').addEventListener('input', (e) => {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
+                updateUrl(e.target.value, document.getElementById('visible-only').checked, document.getElementById('sort').value, 1);
+                loadCategories();
+            }, 300);
+        });
+
+        document.getElementById('visible-only').addEventListener('change', (e) => {
+            const search = document.getElementById('search').value;
+            const isVisible = e.target.checked;
+            const sortBy = document.getElementById('sort').value;
+            updateUrl(search, isVisible, sortBy, 1);
+            loadCategories();
+        });
+
+        document.getElementById('sort').addEventListener('change', (e) => {
+            const search = document.getElementById('search').value;
+            const isVisible = document.getElementById('visible-only').checked;
+            const sortBy = e.target.value;
+            updateUrl(search, isVisible, sortBy, 1);
+            loadCategories();
+        });
+    });
+
+    window.goToPage = goToPage;
 </script>
+
 </body>
 </html>

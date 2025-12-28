@@ -61,63 +61,124 @@
 
 <script>
     const API = '/api';
-    let page = 1, totalPages = 1;
+    const API_URL = 'http://localhost:5263/api/warehouses/filtered';
+    const PAGE_SIZE = 5;
 
-    window.showToast = (msg, type = 'success') => {
-        const c = { success: 'green', error: 'red', warning: 'yellow' };
-        const el = document.createElement('div');
-        el.className = `bg-${c[type]}-100 border-l-4 border-${c[type]}-500 text-${c[type]}-700 p-3 rounded`;
-        el.innerHTML = `<p>${msg}</p>`;
-        document.getElementById('toast-container').appendChild(el);
-        setTimeout(() => el.remove(), 5000);
-    };
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
 
-    const load = async () => {
-        const search = document.getElementById('search').value || '';
-        const sort = document.getElementById('sort').value || 'name';
-        const url = `${API}/warehouses/filtered?search=${encodeURIComponent(search)}&sortBy=${sort}&page=${page}&pageSize=5`;
+    function getUrlParam(name) {
+        const params = new URLSearchParams(window.location.search);
+        return params.get(name) || '';
+    }
+
+    function updateUrl(search, sortBy, page) {
+        const params = new URLSearchParams();
+        if (search) params.set('search', search);
+        if (sortBy && sortBy !== 'name') params.set('sortBy', sortBy);
+        if (page > 1) params.set('page', page);
+        window.history.replaceState(null, '', `?${params.toString()}`);
+    }
+
+    async function loadWarehouses() {
+        const search = getUrlParam('search');
+        const sortBy = getUrlParam('sortBy') || 'name';
+        const page = parseInt(getUrlParam('page')) || 1;
+
+        document.getElementById('search').value = search;
+        document.getElementById('sort').value = sortBy;
 
         try {
-            const res = await fetch(url);
+            const params = new URLSearchParams();
+            if (search) params.set('search', search);
+            if (sortBy && sortBy !== 'name') params.set('sortBy', sortBy);
+            params.set('page', page);
+            params.set('pageSize', PAGE_SIZE);
+
+            const url = `${API_URL}?${params.toString()}`;
+            const res = await fetch(url, {
+                method: 'GET',
+                cache: 'no-store' 
+            });
             const data = await res.json();
-            totalPages = data.totalPages;
 
             document.getElementById('table-body').innerHTML = data.items.map(w => `
-          <tr>
-            <td class="px-6 py-4">${w.name}</td>
-            <td class="px-6 py-4">${w.location}</td>
-            <td class="px-6 py-4">
-              <button onclick="del('${w.id}')" class="text-red-600 hover:underline text-sm">Удалить</button>
-            </td>
-          </tr>
-        `).join('');
+        <tr>
+          <td class="px-6 py-4 font-medium">${escapeHtml(w.name)}</td>
+          <td class="px-6 py-4 text-gray-600">${escapeHtml(w.location) || '—'}</td>
+          <td class="px-6 py-4">${new Date(w.createdAt).toLocaleString('ru-RU')}</td>
+          <td class="px-6 py-4">
+             <button onclick="deleteWarehouse('${w.id}')" class="text-red-600 hover:underline text-sm">Удалить</button>
+          </td>
+        </tr>
+      `).join('');
 
-            // Пагинация
             let pg = '';
-            for (let i = 1; i <= totalPages; i++) {
-                pg += `<button onclick="goTo(${i})" class="px-3 py-1 border rounded ${i === page ? 'bg-blue-600 text-white' : ''}">${i}</button>`;
+            for (let i = 1; i <= data.totalPages; i++) {
+                pg += `<button onclick="goToPage(${i})" class="px-3 py-1 border rounded ${i === page ? 'bg-green-600 text-white' : ''}">${i}</button>`;
             }
             document.getElementById('pagination').innerHTML = pg;
-        } catch (e) {
-            showToast('Ошибка загрузки данных', 'error');
-        }
-    };
 
-    const goTo = (p) => { page = p; load(); };
-    const del = async (id) => {
-        if (!confirm('Удалить склад?')) return;
+        } catch (e) {
+            console.error('Ошибка загрузки складов:', e);
+            document.getElementById('table-body').innerHTML = `<tr><td colspan="4" class="text-center text-red-600">Ошибка загрузки</td></tr>`;
+        }
+    }
+
+    function goToPage(page) {
+        const search = document.getElementById('search').value;
+        const sortBy = document.getElementById('sort').value;
+        updateUrl(search, sortBy, page);
+        loadWarehouses();
+    }
+
+    const deleteWarehouse = async (id) => {
+        if (!confirm('Удалить склад? Все связанные остатки будут удалены.')) return;
+
         try {
-            await fetch(`${API}/warehouses/${id}`, { method: 'DELETE' });
-            showToast('Склад удалён');
-            load();
-        } catch (e) {
-            showToast('Не удалось удалить', 'error');
+            const response = await fetch(`/api/warehouses/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                // Успешно удалено → обновляем таблицу
+                await loadWarehouses();
+            } else {
+                alert('Не удалось удалить склад. Статус: ' + response.status);
+            }
+        } catch (error) {
+            console.error('Ошибка при удалении:', error);
+            alert('Произошла ошибка при удалении склада.');
         }
     };
 
-    document.getElementById('search').addEventListener('input', load);
-    document.getElementById('sort').addEventListener('change', load);
-    document.addEventListener('DOMContentLoaded', load);
+    // === ЕДИНСТВЕННЫЙ DOMContentLoaded ===
+    document.addEventListener('DOMContentLoaded', () => {
+        loadWarehouses();
+
+        // Поиск с debounce
+        let searchTimer;
+        document.getElementById('search').addEventListener('input', (e) => {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
+                updateUrl(e.target.value, document.getElementById('sort').value, 1);
+                loadWarehouses();
+            }, 300);
+        });
+
+        // Сортировка
+        document.getElementById('sort').addEventListener('change', (e) => {
+            updateUrl(document.getElementById('search').value, e.target.value, 1);
+            loadWarehouses();
+        });
+    });
+
+    window.goToPage = goToPage;
 </script>
+
 </body>
 </html>
