@@ -14,8 +14,8 @@ public class CreateProductDto
     public int TotalQuantity { get; set; }
     [Required]
     public Guid CategoryId { get; set; }
-    
+
     [Required]
     public Guid SupplierId { get; set; }
-    
+
 }
