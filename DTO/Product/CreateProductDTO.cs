@@ -10,6 +10,9 @@ public class CreateProductDto
     public string Name { get; set; } = string.Empty;
     [Required]
     public string Unit { get; set; } = string.Empty;
+
+    public string? Description { get; set; }
+
     [Required]
     public int TotalQuantity { get; set; }
     [Required]

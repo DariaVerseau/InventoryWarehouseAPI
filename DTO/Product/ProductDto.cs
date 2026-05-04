@@ -5,20 +5,22 @@ using DTO.Supplier;
 
 namespace DTO.Product;
 
-public class ProductDto 
+public class ProductDto
 {
     public Guid Id { get; set; }
     [Required]
     public string Name { get; set; } = string.Empty;
     [Required]
     public string Unit { get; set; } = string.Empty;
-    
+
+    public string? Description { get; set; }
+
     [Required]
     public int TotalQuantity { get; set; }
-   public CategoryShortDto? Category { get; set; }
+    public CategoryShortDto? Category { get; set; }
     public SupplierShortDto? Supplier { get; set; }
     public bool IsVisible { get; set; }
-    
+
     // Навигационное свойство к остаткам
     public List<InventoryShortDto> InventoryRecords { get; set; } = new();
     public DateTime CreatedAt { get; set; }

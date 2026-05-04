@@ -12,13 +12,13 @@ public class Product : BaseEntity
     public Guid? SupplierId { get; set; }
     public Supplier? Supplier { get; set; }
     public int TotalQuantity { get; set; }
-    public string Description { get; set; }
-    
+    public string? Description { get; set; }
+
     public bool IsVisible { get; set; }
-    
+
     // Навигационное свойство к остаткам
     public List<Inventory> InventoryRecords { get; set; } = new(); //навигационное свойство с Inventory
-    
+
 }
 
 public class ProductMap : IEntityTypeConfiguration<Product>
@@ -28,47 +28,47 @@ public class ProductMap : IEntityTypeConfiguration<Product>
         builder.ToTable("products"); // Явное указание имени таблицы
 
         builder.HasKey(p => p.Id);
-        
+
         builder.Property(p => p.Name)
             .IsRequired()
             .HasMaxLength(50)
             .HasColumnName("name"); // Соответствие имени столбца в БД
-            
+
         builder.Property(p => p.Unit)
             .IsRequired()
             .HasMaxLength(10)
             .HasColumnName("unit");
-        
+
         builder.Property(p => p.TotalQuantity)
             .IsRequired()
             .HasColumnName("TotalQuantity")
             .HasComment("Текущее количество товара");
-            
+
         builder.Property(p => p.CreatedAt)
             .IsRequired()
             .HasColumnName("created_at")
             .HasDefaultValueSql("CURRENT_TIMESTAMP")  // Значение по умолчанию
             .ValueGeneratedOnAdd()  // Автогенерация при создании
             .HasComment("Дата создания записи");
-            
+
         builder.Property(p => p.UpdatedAt)
             .IsRequired()
             .HasColumnName("updated_at")
             .HasDefaultValueSql("CURRENT_TIMESTAMP")  // Значение по умолчанию
             .ValueGeneratedOnAddOrUpdate()  // Автогенерация при обновлении
             .HasComment("Дата последнего обновления");
-        
+
         builder
             .Property(an => an.IsVisible)
             .HasDefaultValue(true)
             .IsRequired();
-        
+
         builder.Property(p => p.Description)
             .IsRequired()
             .HasColumnName("description")
             .HasMaxLength(500);
-            
-        
+
+
         // Настройка связи с Category
         builder.HasOne(p => p.Category)
             .WithMany(c => c.Products)
@@ -76,7 +76,7 @@ public class ProductMap : IEntityTypeConfiguration<Product>
             .IsRequired(false) // Если CategoryId может быть NULL
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("FK_Products_Categories");
-            
+
         // Настройка связи с Supplier
         builder.HasOne(p => p.Supplier)
             .WithMany(s => s.Products)
@@ -84,7 +84,7 @@ public class ProductMap : IEntityTypeConfiguration<Product>
             .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("FK_Products_Suppliers");
-        
+
         // Настройка связи с Inventory
         builder.HasMany(p => p.InventoryRecords)
             .WithOne(i => i.Product)
