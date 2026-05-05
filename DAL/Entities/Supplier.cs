@@ -40,14 +40,14 @@ public class SupplierMap : IEntityTypeConfiguration<Supplier>
         builder.Property(s => s.CreatedAt)
             .IsRequired()
             .HasColumnName("created_at")
-            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            //.HasDefaultValueSql("CURRENT_TIMESTAMP")
             .ValueGeneratedOnAdd();
             
         builder.Property(s => s.UpdatedAt)
             .IsRequired()
             .HasColumnName("updated_at")
-            .ValueGeneratedOnAddOrUpdate()
-            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            .ValueGeneratedOnAddOrUpdate();
+            //.HasDefaultValueSql("CURRENT_TIMESTAMP");
         
      /*   builder.HasMany(s => s.Products)
             .WithOne(p => p.Supplier)

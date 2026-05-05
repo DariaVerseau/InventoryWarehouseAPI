@@ -47,16 +47,14 @@ public class ProductMap : IEntityTypeConfiguration<Product>
         builder.Property(p => p.CreatedAt)
             .IsRequired()
             .HasColumnName("created_at")
-            .HasDefaultValueSql("CURRENT_TIMESTAMP")  // Значение по умолчанию
-            .ValueGeneratedOnAdd()  // Автогенерация при создании
-            .HasComment("Дата создания записи");
+            .ValueGeneratedOnAdd()  // БД сама установит при вставке
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         builder.Property(p => p.UpdatedAt)
             .IsRequired()
             .HasColumnName("updated_at")
-            .HasDefaultValueSql("CURRENT_TIMESTAMP")  // Значение по умолчанию
-            .ValueGeneratedOnAddOrUpdate()  // Автогенерация при обновлении
-            .HasComment("Дата последнего обновления");
+            .ValueGeneratedOnAddOrUpdate()  // БД сама обновляет
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         builder
             .Property(an => an.IsVisible)

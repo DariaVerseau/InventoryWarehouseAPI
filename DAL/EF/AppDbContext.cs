@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace DAL.EF;
 
 public class AppDbContext : DbContext
-{  
+{
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
         //Database.EnsureCreated();
@@ -26,18 +26,7 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new CategoryMap());
         modelBuilder.ApplyConfiguration(new InventoryMap());
         modelBuilder.ApplyConfiguration(new UserMap());
-        modelBuilder.Entity<Category>().HasData(
-            new Category { 
-                Id = Guid.Parse("a2d3b4c5-6f7e-8d9c-0b1a-2d3e4f5a6b7c"), 
-                Name = "Электроника", 
-                Description = "Гаджеты и устройства" 
-            },
-            new Category { 
-                Id = Guid.Parse("b3c4d5e6-7f8e-9d0c-1a2b-3c4d5e6f7a8b"), 
-                Name = "Одежда", 
-                Description = "Мужская и женская одежда" 
-            }
-        );
+        
         modelBuilder.Entity<Product>(entity =>
         {
             entity.Property(e => e.UpdatedAt)
@@ -46,6 +35,6 @@ public class AppDbContext : DbContext
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .ValueGeneratedOnAddOrUpdate();
         });
-        
+
     }
 }

@@ -11,7 +11,7 @@ public class CreateProductDto
     [Required]
     public string Unit { get; set; } = string.Empty;
 
-    public string? Description { get; set; }
+    public string? Description { get; set; } = string.Empty;
 
     [Required]
     public int TotalQuantity { get; set; }

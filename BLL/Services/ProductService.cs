@@ -42,7 +42,7 @@ public class ProductService : IProductService
             PageSize = pageSize
         };
     }
-    
+
     public async Task<List<ProductDto>> GetAll()
     {
         var products = await _productRepo.GetAllWithDetailsAsync();
@@ -70,7 +70,10 @@ public class ProductService : IProductService
             TotalQuantity = dto.TotalQuantity,
             CategoryId = dto.CategoryId,
             SupplierId = dto.SupplierId,
-            IsVisible = true // по умолчанию
+            IsVisible = true, // по умолчанию
+            Description = dto.Description ?? string.Empty,
+            CreatedAt = DateTime.UtcNow, 
+            UpdatedAt = DateTime.UtcNow
         };
 
         var created = await _productRepo.Create(product);
@@ -114,7 +117,7 @@ public class ProductService : IProductService
     {
         return await _productRepo.GetTotalStockQuantityAsync(productId);
     }
-    
+
     public async Task<PagedResponse<ProductDto>> GetFilteredProducts(ProductFilterDto filter)
     {
         if (filter.Page < 1) filter.Page = 1;
