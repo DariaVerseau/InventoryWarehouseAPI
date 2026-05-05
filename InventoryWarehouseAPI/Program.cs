@@ -4,6 +4,7 @@ using BLL.Services;
 using DAL.EF;
 using DAL.Interfaces;
 using DAL.Repositories;
+using DAL.SeedData;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -89,6 +90,8 @@ app.UseAuthorization();
 app.UseStaticFiles();
 
 app.MapControllers();
+
+await DatabaseSeeder.SeedAsync(app.Services);
 
 app.Run();
 
